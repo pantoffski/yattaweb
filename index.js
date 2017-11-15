@@ -6,7 +6,7 @@ const app = express();
 var history = require('connect-history-api-fallback');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-app.set('port', (process.env.PORT));
+app.set('port', (process.env.PORT || 5000));
 var root = __dirname + '/public';
 app.use(express.static('public'));
 app.use(history({
