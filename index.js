@@ -16,7 +16,8 @@ app.use(history({
   }, {
     from: /\/bar/,
     to: 'index.html'
-  }]
+  }],
+  verbose: true
 }));
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({
