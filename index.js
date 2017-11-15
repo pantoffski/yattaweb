@@ -12,7 +12,10 @@ app.use(express.static('public'));
 app.use(history({
   rewrites: [{
     from: /\/foo/,
-    to: '/bar'
+    to: '/index.html'
+  },{
+    from: /\/bar/,
+    to: 'index.html'
   }]
 }));
 app.use(express.static('public'));
