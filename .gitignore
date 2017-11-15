@@ -3,7 +3,6 @@ _src
 webpack.dev.config.js
 webpack.build.config.js
 tmp.js
-index.html
 dev.html
 .babelrc
 # Logs
