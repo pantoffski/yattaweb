@@ -5,6 +5,7 @@ webpack.build.config.js
 tmp.js
 dev.html
 .babelrc
+public/file
 # Logs
 logs
 *.log
