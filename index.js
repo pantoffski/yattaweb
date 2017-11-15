@@ -13,7 +13,7 @@ app.use(history({
   rewrites: [{
     from: /\/foo/,
     to: '/index.html'
-  },{
+  }, {
     from: /\/bar/,
     to: 'index.html'
   }]
@@ -29,6 +29,9 @@ app.all('/', function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
+});
+app.get('/test', function (req, res) {
+  res.send('ok na ja')
 });
 app.post('/:raceName/clear', function (req, res) {
   if (req.body.race && req.body.race.split('').reverse().join('') == req.params.raceName) {
