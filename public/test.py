@@ -5,8 +5,9 @@ import sqlite3
 import requests
 import json
 
-yattaUrl='https://yattaweb.herokuapp.com/soundRun'
-yattaPwd='nuRdnuos'
+yattaRaceName = 'maiRun'
+yattaUrl = 'https://yattaweb.herokuapp.com/soundRun'
+yattaPwd = yattaRaceName[::-1]
 connectionString = "file:tagDb?mode=memory&cache=shared"
 matId = 1
 
@@ -16,17 +17,20 @@ def tStamp(): return int(round(time.time() * 1000))
 
 def save2db(tags):
     print "adding {} tags".format(len(tags))
-    db = sqlite3.connect(connectionString)
-    conn = db.cursor()
-    for tag in tags:
+    doneSave = False
+    while(not doneSave):
         try:
-            # print "{},{},{}".format(tag[0],tag[1],tag[2])
-            conn.execute('insert into test values(?,?,?)',
-                         (tag[0], tag[1], tag[2]))
+            db = sqlite3.connect(connectionString)
+            conn = db.cursor()
+            for tag in tags:
+                conn.execute('insert into test values(?,?,?)',
+                             (tag[0], tag[1], tag[2]))
+            db.commit()
+            db.close()
+            doneSave = True
         except Exception:
+            print 'addtags errror'
             pass
-    db.commit()
-    db.close()
 
 
 def readTag():
@@ -36,10 +40,10 @@ def readTag():
     save2dbThread.daemon = True
     tagId = 0
     while(1):
-        # tagId = randint(1, 3000)
+        tagId = randint(1, 3000)
         tagId += 1
         ts = tStamp()
-        if(tagId < 5000):
+        if(tagId <= 5000):
             bank[bankIdx].append((matId, tagId, ts))
             bank[bankIdx].append((matId, tagId, ts + 1))
             bank[bankIdx].append((matId, tagId, ts + 2))
@@ -52,6 +56,7 @@ def readTag():
             bankIdx = (bankIdx + 1) % 2
             bank[bankIdx] = []
         time.sleep(0.001349527665)
+        #time.sleep(0.501349527665)
 
 
 def postToServer():
@@ -67,7 +72,7 @@ def postToServer():
             tags = json.dumps(rs)
 
             if(len(tags) > 0):
-                req = requests.post(yattaUrl+'/addTags',
+                req = requests.post('https://yattaweb.herokuapp.com/' + yattaRaceName + '/addTags',
                                     data={'tags': '[' + tags + ']'})
                 print req.text
                 for r in rs:
@@ -76,15 +81,20 @@ def postToServer():
                                  (r[0], r[1]))
                 db.commit()
                 db.close()
+        except KeyboardInterrupt:
+            print 'postToServer KeyboardInterrupt'
+            pass
         except Exception:
             print "error post to server"
             pass
-        #time.sleep(0.5)
+        # time.sleep(0.5)
 
 
-req = requests.post(yattaUrl+'/clear',
-                    data={'race':yattaPwd})
+req = requests.post('https://yattaweb.herokuapp.com/' + yattaRaceName + '/clear',
+                    data={'race': yattaPwd})
 print req.text
+
+#raise SystemExit
 db = sqlite3.connect("file:tagDb?mode=memory&cache=shared")
 conn = db.cursor()
 conn.execute('''drop table if exists test''')
@@ -99,15 +109,29 @@ readTagThread.start()
 postToServerThread = Thread(target=postToServer)
 postToServerThread.daemon = True
 postToServerThread.start()
+
 try:
-    foo = 0
     while(1):
-        time.sleep(1)
-        foo += 1
-        if(foo % 10 == 0):
-            print('in main thread')
-            matId = matId + 1
-            print(matId)
+        try:
+            foo = 0
+            while(1):
+                time.sleep(1)
+                foo += 1
+                if(foo % 10 == 0):
+                    print('in main thread')
+                    matId = matId + 1
+                    print(matId)
+        except KeyboardInterrupt:
+            try:
+                print('keyboard interrupt naja')
+                inp = int(input("input matId :"))
+                print inp
+                if(inp == 0):
+                    raise SystemExit
+                if(inp > 0):
+                    matId = inp
+            except Exception:
+                pass
 except KeyboardInterrupt:
-    print('keyboard interrupt naja')
+    print('keyboard interrupt again naja')
 print('done')
