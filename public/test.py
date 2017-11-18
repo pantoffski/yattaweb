@@ -16,7 +16,7 @@ def tStamp(): return int(round(time.time() * 1000))
 
 
 def save2db(tags):
-    print "adding {} tags".format(len(tags))
+    # print "adding {} tags".format(len(tags))
     doneSave = False
     while(not doneSave):
         try:
@@ -40,10 +40,10 @@ def readTag():
     save2dbThread.daemon = True
     tagId = 0
     while(1):
-        tagId = randint(1, 3000)
+        #tagId = randint(1, 3000)
         tagId += 1
         ts = tStamp()
-        if(tagId <= 5000):
+        if(tagId <= 500):
             bank[bankIdx].append((matId, tagId, ts))
             bank[bankIdx].append((matId, tagId, ts + 1))
             bank[bankIdx].append((matId, tagId, ts + 2))
@@ -56,7 +56,7 @@ def readTag():
             bankIdx = (bankIdx + 1) % 2
             bank[bankIdx] = []
         time.sleep(0.001349527665)
-        #time.sleep(0.501349527665)
+        # time.sleep(0.501349527665)
 
 
 def postToServer():
@@ -66,21 +66,24 @@ def postToServer():
             conn = db.cursor()
             conn.execute('select count(*) from test')
             rs = conn.fetchall()
-            print "remaining {} tags".format(rs[0])
             conn.execute('select * from test order by tStamp asc limit 300')
-            rs = conn.fetchall()
-            tags = json.dumps(rs)
+            rs2 = conn.fetchall()
+            tags = json.dumps(rs2)
+            sendingTagCount = len(rs2)
 
-            if(len(tags) > 0):
+
+            if(sendingTagCount > 0):
+                print "sending {} tags, remaining {}    tags".format(sendingTagCount, rs[0][0])
                 req = requests.post('https://yattaweb.herokuapp.com/' + yattaRaceName + '/addTags',
                                     data={'tags': '[' + tags + ']'})
-                print req.text
-                for r in rs:
-                    # print
-                    conn.execute('delete from test where matId=? and tagId=?',
-                                 (r[0], r[1]))
-                db.commit()
-                db.close()
+                print "server return :: {}".format(req.text)
+                if(int(req.text) == sendingTagCount):
+                    for r in rs2:
+                        # print
+                        conn.execute('delete from test where matId=? and tagId=?',
+                                     (r[0], r[1]))
+                    db.commit()
+                    db.close()
         except KeyboardInterrupt:
             print 'postToServer KeyboardInterrupt'
             pass
@@ -113,14 +116,8 @@ postToServerThread.start()
 try:
     while(1):
         try:
-            foo = 0
             while(1):
                 time.sleep(1)
-                foo += 1
-                if(foo % 10 == 0):
-                    print('in main thread')
-                    matId = matId + 1
-                    print(matId)
         except KeyboardInterrupt:
             try:
                 print('keyboard interrupt naja')
@@ -132,6 +129,6 @@ try:
                     matId = inp
             except Exception:
                 pass
-except KeyboardInterrupt:
-    print('keyboard interrupt again naja')
+except Exception:
+    pass
 print('done')
