@@ -6,7 +6,6 @@ import requests
 import json
 
 yattaRaceName = 'maiRun'
-yattaUrl = 'https://yattaweb.herokuapp.com/soundRun'
 yattaPwd = yattaRaceName[::-1]
 connectionString = "file:tagDb?mode=memory&cache=shared"
 matId = 1
