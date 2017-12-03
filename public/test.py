@@ -5,7 +5,7 @@ import sqlite3
 import requests
 import json
 
-yattaRaceName = 'maiRun'
+yattaRaceName = 'maiRun2'
 yattaPwd = yattaRaceName[::-1]
 connectionString = "file:tagDb?mode=memory&cache=shared"
 matId = 1
@@ -28,7 +28,7 @@ def save2db(tags):
             db.close()
             doneSave = True
         except Exception:
-            print 'addtags errror'
+            print ('addtags errror')
             pass
 
 
@@ -41,8 +41,9 @@ def readTag():
     while(1):
         #tagId = randint(1, 3000)
         tagId += 1
+        tagId=97125861720341814L
         ts = tStamp()
-        if(tagId <= 500):
+        if(tagId <= 69943997092497125861720341814L):
             bank[bankIdx].append((matId, tagId, ts))
             bank[bankIdx].append((matId, tagId, ts + 1))
             bank[bankIdx].append((matId, tagId, ts + 2))
@@ -55,7 +56,7 @@ def readTag():
             bankIdx = (bankIdx + 1) % 2
             bank[bankIdx] = []
         time.sleep(0.001349527665)
-        # time.sleep(0.501349527665)
+        time.sleep(0.501349527665)
 
 
 def postToServer():
@@ -70,12 +71,12 @@ def postToServer():
             tags = json.dumps(rs2)
             sendingTagCount = len(rs2)
 
-
             if(sendingTagCount > 0):
-                print "sending {} tags, remaining {}    tags".format(sendingTagCount, rs[0][0])
+                print ("sending {} tags, remaining {}    tags".format(
+                    sendingTagCount, rs[0][0]))
                 req = requests.post('https://yattaweb.herokuapp.com/' + yattaRaceName + '/addTags',
                                     data={'tags': '[' + tags + ']'})
-                print "server return :: {}".format(req.text)
+                print ("server return :: {}".format(req.text))
                 if(int(req.text) == sendingTagCount):
                     for r in rs2:
                         # print
@@ -84,17 +85,17 @@ def postToServer():
                     db.commit()
                     db.close()
         except KeyboardInterrupt:
-            print 'postToServer KeyboardInterrupt'
+            print ('postToServer KeyboardInterrupt')
             pass
         except Exception:
-            print "error post to server"
+            print ("error post to server")
             pass
         # time.sleep(0.5)
 
 
 req = requests.post('https://yattaweb.herokuapp.com/' + yattaRaceName + '/clear',
                     data={'race': yattaPwd})
-print req.text
+print (req.text)
 
 #raise SystemExit
 db = sqlite3.connect("file:tagDb?mode=memory&cache=shared")
@@ -121,7 +122,7 @@ try:
             try:
                 print('keyboard interrupt naja')
                 inp = int(input("input matId :"))
-                print inp
+                print (inp)
                 if(inp == 0):
                     raise SystemExit
                 if(inp > 0):
