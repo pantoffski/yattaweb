@@ -27,7 +27,7 @@ app.all('/', function (req, res, next) {
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
 });
-app.get('/runners/:tStamp', function (req, res) {
+app.post('/runners/:tStamp', function (req, res) {
   var ret = [];
   runners.find({
     tagId: {
