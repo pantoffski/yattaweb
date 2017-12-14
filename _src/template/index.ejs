@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+      <title>
+        yatta dev
+      </title>
+      <!-- รูป, css, js, ทุกสิ่งที่เป็น file อยู่ใน compilation.assets ทั้งน้านน -->
+      <%
+        console.log('==== assets =====');
+        for(var k in compilation.assets){
+          console.log(k);
+          if(k.toLowerCase().indexOf('critical')>=0){%>
+            <style><%=compilation.assets[k].source()%></style>
+          <%}
+        }
+      %>
+    </head>
+
+    <body class="">
+      <div id='app'></div>
+      <!-- css -->
+      <% for (var k in htmlWebpackPlugin.files.css) {
+        console.log('\n\n-- css --');
+          console.log(k);
+        if(htmlWebpackPlugin.files.css[k].toLowerCase().indexOf('critical')<0){%>
+      <link href="<%= htmlWebpackPlugin.files.css[k] %>" rel="stylesheet">
+      <% }} %>
+      <!-- js -->
+      <%
+        for(var k in compilation.assets){
+          if(k.toLowerCase().indexOf('manifest')>=0&&k.toLowerCase().indexOf('.map')<0){%>
+            <script><%=compilation.assets[k].source()%></script>
+          <%}
+        }
+      %>
+      <% for (var k in htmlWebpackPlugin.files.chunks) {
+        if(k.toLowerCase().indexOf('manifest')<0){%>
+        <script src="<%= htmlWebpackPlugin.files.chunks[k].entry %>"></script>
+        <% }} %>
+    </body>
+
+</html>
