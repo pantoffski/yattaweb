@@ -71,7 +71,9 @@ def postToServer():
                 req = requests.post(yattaUrl + '/addTags',
                                     # data={'tags': '[[1,1,1],[2,2,2]]'})
                                     data={'tags': tags})
-                print ("srv return {}".format(req.text))
+                print ("srv return {} {}".format(req.text,len(rs)))
+                if(len(rs) == int(req.text)):
+                    print('number matched')
                 for r in rs:
                     # print
                     conn.execute('delete from test where matId=? and tagId=?',
