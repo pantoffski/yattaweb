@@ -62,15 +62,16 @@ def postToServer():
             conn = db.cursor()
             conn.execute('select count(*) from test')
             rs = conn.fetchall()
-            print "remaining {} tags".format(rs[0])
+            print "remaining {} tags".format(rs[0][0])
             conn.execute('select * from test order by tStamp asc limit 300')
             rs = conn.fetchall()
             tags = json.dumps(rs)
-            if(len(tags) > 0):
+            print "tag len {}".format(len(rs))
+            if(len(rs) > 0):
                 req = requests.post(yattaUrl + '/addTags',
                                     # data={'tags': '[[1,1,1],[2,2,2]]'})
                                     data={'tags': tags})
-                print ("srv return ?".format(req.text))
+                print ("srv return {}".format(req.text))
                 for r in rs:
                     # print
                     conn.execute('delete from test where matId=? and tagId=?',
