@@ -32,7 +32,6 @@ app.post('/apinaja/addTags', function (req, res) {
   var tags = req.body.tags;
   console.log('addTags');
   if(!Array.isArray(tags))tags=JSON.parse(tags);
-  console.log(tags);
   var tag2find = [...new Set(tags.map(t => t[1]))];
   var updatedAt = new Date().getTime();
   var gunTime = 84;
@@ -70,6 +69,7 @@ app.post('/apinaja/addTags', function (req, res) {
     });
     Promise.all(addingTags).then((resolve) => {
       io.emit('tags',1);
+      console.log('done add ',tags.length);
       res.send(tags.length + '');
     });
   });

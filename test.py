@@ -15,7 +15,7 @@ def tStamp(): return int(round(time.time() * 1000))
 
 
 def save2db(tags):
-    print "adding {} tags".format(len(tags))
+    #print "adding {} tags".format(len(tags))
     db = sqlite3.connect(connectionString)
     conn = db.cursor()
     for tag in tags:
@@ -51,8 +51,8 @@ def readTag():
             save2dbThread.start()
             bankIdx = (bankIdx + 1) % 2
             bank[bankIdx] = []
-        # time.sleep(0.001349527665)
-        time.sleep(0.101349527665)
+        time.sleep(0.001349527665)
+        #time.sleep(0.101349527665)
 
 
 def postToServer():
@@ -66,12 +66,11 @@ def postToServer():
             conn.execute('select * from test order by tStamp asc limit 300')
             rs = conn.fetchall()
             tags = json.dumps(rs)
-            print(tags)
             if(len(tags) > 0):
                 req = requests.post(yattaUrl + '/addTags',
                                     # data={'tags': '[[1,1,1],[2,2,2]]'})
                                     data={'tags': tags})
-                print req.text
+                print ("srv return ?".format(req.text))
                 for r in rs:
                     # print
                     conn.execute('delete from test where matId=? and tagId=?',
