@@ -20,7 +20,7 @@ def save2db(tags):
     conn = db.cursor()
     for tag in tags:
         try:
-            # print "{},{},{}".format(tag[0],tag[1],tag[2])
+            #print "{},{},{}".format(tag[0],tag[1],tag[2])
             conn.execute('insert into test values(?,?,?)',
                          (tag[0], tag[1], tag[2]))
         except Exception:
@@ -51,7 +51,8 @@ def readTag():
             save2dbThread.start()
             bankIdx = (bankIdx + 1) % 2
             bank[bankIdx] = []
-        time.sleep(0.001349527665)
+        #time.sleep(0.001349527665)
+        time.sleep(0.101349527665)
 
 
 def postToServer():
@@ -65,10 +66,11 @@ def postToServer():
             conn.execute('select * from test order by tStamp asc limit 300')
             rs = conn.fetchall()
             tags = json.dumps(rs)
-
+            print(tags)
             if(len(tags) > 0):
                 req = requests.post(yattaUrl+'/addTags',
-                                    data={'tags': '[' + tags + ']'})
+                                    data={'tags': '[[1,1,1],[2,2,2]]'})
+                                    #data={'tags': '[' + tags + ']'})
                 print req.text
                 for r in rs:
                     # print

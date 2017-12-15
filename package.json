@@ -9,7 +9,7 @@
     "dev": "cross-env NODE_ENV=development webpack-dev-server --openPage index.html --hot --config webpack.dev.config.js"
   },
   "engines": {
-    "node": "^7.6"
+    "node": "^8.4"
   },
   "author": "",
   "license": "ISC",
