@@ -31,7 +31,6 @@ app.use(function (req, res, next) {
 app.post('/apinaja/addTags', function (req, res) {
   var tags = req.body.tags;
   console.log('addTags');
-  console.log(req);
   console.log(req.body);
   console.log(tags);
   var tag2find = [...new Set(tags.map(t => t[1]))];
