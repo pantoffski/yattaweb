@@ -5,8 +5,8 @@ import sqlite3
 import requests
 import json
 
-yattaUrl='https://yattaweb.herokuapp.com/apinaja'
-yattaPwd='nuRdnuos'
+yattaUrl = 'https://yattaweb.herokuapp.com/apinaja'
+yattaPwd = 'nuRdnuos'
 connectionString = "file:tagDb?mode=memory&cache=shared"
 matId = 1
 
@@ -20,7 +20,7 @@ def save2db(tags):
     conn = db.cursor()
     for tag in tags:
         try:
-            #print "{},{},{}".format(tag[0],tag[1],tag[2])
+            # print "{},{},{}".format(tag[0],tag[1],tag[2])
             conn.execute('insert into test values(?,?,?)',
                          (tag[0], tag[1], tag[2]))
         except Exception:
@@ -51,7 +51,7 @@ def readTag():
             save2dbThread.start()
             bankIdx = (bankIdx + 1) % 2
             bank[bankIdx] = []
-        #time.sleep(0.001349527665)
+        # time.sleep(0.001349527665)
         time.sleep(0.101349527665)
 
 
@@ -68,9 +68,9 @@ def postToServer():
             tags = json.dumps(rs)
             print(tags)
             if(len(tags) > 0):
-                req = requests.post(yattaUrl+'/addTags',
-                                    data={'tags': '[[1,1,1],[2,2,2]]'})
-                                    #data={'tags': '[' + tags + ']'})
+                req = requests.post(yattaUrl + '/addTags',
+                                    # data={'tags': '[[1,1,1],[2,2,2]]'})
+                                    data={'tags': tags})
                 print req.text
                 for r in rs:
                     # print
@@ -81,7 +81,7 @@ def postToServer():
         except Exception:
             print "error post to server"
             pass
-        #time.sleep(0.5)
+        # time.sleep(0.5)
 
 
 # req = requests.post('https://yattaweb.herokuapp.com/icmm2018/clear',
