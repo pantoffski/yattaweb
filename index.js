@@ -30,6 +30,8 @@ app.use(function (req, res, next) {
 });
 app.post('/apinaja/addTags', function (req, res) {
   var tags = req.body.tags;
+  console.log('addTags');
+  console.log(tags);
   var tag2find = [...new Set(tags.map(t => t[1]))];
   var updatedAt = new Date().getTime();
   var gunTime = 84;

@@ -86,8 +86,8 @@ def postToServer():
 #                     data={'race':'8102mmci'})
 # req = requests.post(yattaUrl+'/clear',
 #                     data={'race':yattaPwd})
-raise SystemExit
-print req.text
+# raise SystemExit
+# print req.text
 db = sqlite3.connect("file:tagDb?mode=memory&cache=shared")
 conn = db.cursor()
 conn.execute('''drop table if exists test''')
