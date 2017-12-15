@@ -30,10 +30,7 @@ app.use(function (req, res, next) {
 });
 app.post('/apinaja/addTags', function (req, res) {
   var tags = req.body.tags;
-  if (!Array.isArray(tags)) {
-    console.log('tags not array');
-    tags = JSON.parse(tags);
-  }
+  if (!Array.isArray(tags)) tags = JSON.parse(tags);
   var tag2find = [...new Set(tags.map(t => t[1]))];
   var updatedAt = new Date().getTime();
   var gunTime = 84;
@@ -71,7 +68,7 @@ app.post('/apinaja/addTags', function (req, res) {
     });
     Promise.all(addingTags).then((resolve) => {
       io.emit('tags', 1);
-      console.log(tags.length, ' tags added.');
+      console.log(tags.length+ ' tags added.');
       res.send(tags.length + '');
     });
   });
