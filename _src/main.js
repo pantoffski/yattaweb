@@ -13,7 +13,9 @@ import VueSocketio from 'vue-socket.io';
 // import * as uiv from 'uiv'
 // Vue.use(uiv)
 Vue.use(Vuex);
+//axios.create({baseURL: 'http://localhost:3000/'});
 Vue.prototype.$http = axios;
+//Vue.prototype.$http = axios.create({baseURL: 'http://localhost:3000/'});
 //Vue.http.options.root = 'http://localhost';
 // Vue.config.productionTip = false;
 // Vue.http.options.emulateHTTP = true;

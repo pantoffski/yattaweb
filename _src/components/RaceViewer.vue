@@ -2,8 +2,8 @@
 <div id='raceViewer'>
   <h3 :class="(isConnected?'connected':'')">raceName : {{raceName}}</h3><br/> tags : {{tags.length}}
   <br/><br/>
-  <button @click='initData'>foo</button>
-  <button @click='bar'>bar</button>
+  <button @click='addTags'>addTags</button>
+  <button @click='resetData'>resetData</button>
   <br/>
   <table border=1>
     <thead>
@@ -27,7 +27,8 @@
 <script>
 import {
   mapState,
-  mapGetters,mapActions
+  mapGetters,
+  mapActions
 } from 'vuex';
 export default {
   name: 'raceViewer',
@@ -38,33 +39,54 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['initData','bar']),
-    sortByTagIdClass() {
-      if (this.sortBy == 1) {
-        return (this.sortDi == 1) ? 'up' : 'down';
-      }
+    resetData() {
+      console.log('resetData');
+      this.$http.post('/apinaja/resetRace').then(resp => console.log(resp));
     },
-    sortByMatIdClass() {
-      if (this.sortBy == 0) {
-        return (this.sortDi == 1) ? 'up' : 'down';
-      }
-    },
-    sortBytStampClass() {
-      if (this.sortBy == 2) {
-        return (this.sortDi == 1) ? 'up' : 'down';
-      }
-    },
-    sortByMatId() {
-      this.$store.commit('sortByMatId');
-    },
-    sortByTagId() {
-      this.$store.commit('sortByTagId');
-    },
-    sortBytStamp() {
-      this.$store.commit('sortBytStamp');
+    addTags() {
+      console.log('addTags');
+      this.$http.post('/apinaja/addTags', {
+          tags: [
+            [1, 1, 666],
+            [1, 2, 1666],
+            [2, 4, 2666],
+            [1, 4, 3666],
+            [2, 5, 4666],
+            [2, 6, 4666]
+          ],
+        foo: 'bar'
+      }).then(({
+      data,
+      status
+    }) => console.log(data, status));
+  },
+  ...mapActions(['initData', 'bar']),
+  sortByTagIdClass() {
+    if (this.sortBy == 1) {
+      return (this.sortDi == 1) ? 'up' : 'down';
     }
   },
-  mounted() {
+  sortByMatIdClass() {
+    if (this.sortBy == 0) {
+      return (this.sortDi == 1) ? 'up' : 'down';
+    }
+  },
+  sortBytStampClass() {
+    if (this.sortBy == 2) {
+      return (this.sortDi == 1) ? 'up' : 'down';
+    }
+  },
+  sortByMatId() {
+    this.$store.commit('sortByMatId');
+  },
+  sortByTagId() {
+    this.$store.commit('sortByTagId');
+  },
+  sortBytStamp() {
+    this.$store.commit('sortBytStamp');
+  }
+},
+mounted() {
     //console.log('mounted, raceName: ' + this.raceName);
     this.$socket.emit('joinRace', this.raceName);
   },

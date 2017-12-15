@@ -5,7 +5,7 @@ import sqlite3
 import requests
 import json
 
-yattaUrl='https://yattaweb.herokuapp.com/soundRun'
+yattaUrl='https://yattaweb.herokuapp.com/apinaja'
 yattaPwd='nuRdnuos'
 connectionString = "file:tagDb?mode=memory&cache=shared"
 matId = 1
@@ -82,8 +82,8 @@ def postToServer():
         #time.sleep(0.5)
 
 
-req = requests.post('https://yattaweb.herokuapp.com/icmm2018/clear',
-                    data={'race':'8102mmci'})
+# req = requests.post('https://yattaweb.herokuapp.com/icmm2018/clear',
+#                     data={'race':'8102mmci'})
 # req = requests.post(yattaUrl+'/clear',
 #                     data={'race':yattaPwd})
 raise SystemExit
