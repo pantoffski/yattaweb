@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config();var md5 = require('md5');
 //server
 const bodyParser = require('body-parser')
 const express = require('express');
@@ -31,6 +31,7 @@ app.use(function (req, res, next) {
 app.post('/apinaja/addTags', function (req, res) {
   var tags = req.body.tags;
   if (!Array.isArray(tags)) tags = JSON.parse(tags);
+  var hash=md5(JSON.stringify(tags));
   var tag2find = [...new Set(tags.map(t => t[1]))];
   var updatedAt = new Date().getTime();
   var gunTime = 84;
@@ -69,7 +70,8 @@ app.post('/apinaja/addTags', function (req, res) {
     Promise.all(addingTags).then((resolve) => {
       io.emit('tags', 1);
       console.log(tags.length+ ' tags added.');
-      res.send(tags.length + '');
+      console.log(hash);
+      res.send(hash + '');
     });
   });
 });
