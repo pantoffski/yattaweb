@@ -46,6 +46,7 @@ export default {
     addTags() {
       console.log('addTags');
       this.$http.post('/apinaja/addTags', {
+        stat:'3 tags remain',
           tags: [
             [1, 1, 666],
             [1, 2, 1666],
