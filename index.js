@@ -62,6 +62,114 @@ app.post('/apinaja/addTags', function (req, res) {
     });
   });
 });
+app.post('/apinaja/cleanData', function (req, res) {
+  console.log('cleanData');
+  var mongo = require('mongodb');
+  var MongoClient = mongo.MongoClient;
+  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
+    if (err) {
+      res.send('db error');
+      return false;
+    }
+    res.send('db ok');
+    db.collection('runners').find({
+      tagId: {
+        $ne: null
+      }
+    }).project({
+      bib_number: 1,
+      tagId: 1
+    }).forEach(r => {
+      console.log(r);
+      db.collection('runners').update({
+        _id: r._id
+      }, {
+        $set: {
+          tagIdd: r.tagId * 1
+        }
+      });
+    });
+  });
+});
+app.post('/apinaja/cleanData4', function (req, res) {
+  console.log('cleanData');
+  var mongo = require('mongodb');
+  var MongoClient = mongo.MongoClient;
+  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
+    if (err) {
+      res.send('db error');
+      return false;
+    }
+    res.send('db ok');
+    db.collection('runners').find({
+      tagId: {
+        $eq: NaN
+      }
+    }).project({
+      bib_number: 1,
+    }).forEach(r => {
+      console.log(r);
+      db.collection('runners').update({
+        _id: r._id
+      }, {
+        $unset: {
+          tagId: 1
+        }
+      });
+    });
+  });
+});
+app.post('/apinaja/cleanData5', function (req, res) {
+  console.log('cleanData');
+  var mongo = require('mongodb');
+  var MongoClient = mongo.MongoClient;
+  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
+    if (err) {
+      res.send('db error');
+      return false;
+    }
+    res.send('db ok');
+    db.collection('runners').updateMany({}, {
+      $unset: {
+        isDq: 1
+      }
+    });
+  });
+});
+app.post('/apinaja/cleanData2', function (req, res) {
+  console.log('cleanData');
+  var mongo = require('mongodb');
+  var MongoClient = mongo.MongoClient;
+  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
+    if (err) {
+      res.send('db error');
+      return false;
+    }
+    res.send('db ok');
+    db.collection('runners').updateMany({}, {
+      $unset: {
+        tagId: 1
+      }
+    });
+  });
+});
+app.post('/apinaja/cleanData3', function (req, res) {
+  console.log('cleanData');
+  var mongo = require('mongodb');
+  var MongoClient = mongo.MongoClient;
+  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
+    if (err) {
+      res.send('db error');
+      return false;
+    }
+    res.send('db ok');
+    db.collection('runners').updateMany({}, {
+      $rename: {
+        "tagIdd": "tagId"
+      }
+    });
+  });
+});
 app.post('/apinaja/resetRace', function (req, res) {
   var mongo = require('mongodb');
   var MongoClient = mongo.MongoClient;
@@ -76,8 +184,7 @@ app.post('/apinaja/resetRace', function (req, res) {
         updatedAt: new Date().getTime(),
         chk1: 0,
         chk2: 0,
-        chk3: 0,
-        isDq: false
+        chk3: 0
       }
     });
   });
@@ -143,10 +250,6 @@ var runnersSchema = new mongoose.Schema({
   updatedAt: {
     type: Number,
     index: true
-  },
-  isDq: {
-    type: Boolean,
-    index: true
   }
 }, {
   _id: false
@@ -156,6 +259,6 @@ runnersSchema.statics.findByTags = function (tags, cb) {
     tagId: {
       $in: tags
     }
-  }, 'tagId chk1 chk2 chk3 isDq updatedAt', cb);
+  }, 'tagId chk1 chk2 chk3 updatedAt', cb);
 };
 var runnerModel = mongoose.model('runner', runnersSchema);
