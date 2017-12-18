@@ -32,7 +32,7 @@ app.use(function (req, res, next) {
 app.post('/apinaja/addTags', function (req, res) {
   var tags = req.body.tags;
   var stat = req.body.stat;
-  console.log(stat);
+  console.log(tags);
   if (!Array.isArray(tags)) tags = JSON.parse(tags);
   var hash = md5(JSON.stringify(tags));
   var tag2find = [...new Set(tags.map(t => t[1]))];
@@ -48,21 +48,7 @@ app.post('/apinaja/addTags', function (req, res) {
         });
         runner.updatedAt = updatedAt;
         related.forEach((u, idx) => {
-          if (u[0] == 1) runner.chk1 = u[2];
-          if (u[0] == 2) {
-            runner.chk2 = u[2];
-            if (runner.chk1 == 0) {
-              runner.isDq = true;
-              runner.chk1 = gunTime;
-            }
-          }
-          if (u[0] == 3) {
-            runner.chk3 = u[2];
-            if (runner.chk1 == 0) {
-              runner.isDq = true;
-              runner.chk1 = gunTime;
-            }
-          }
+          if (runner['chk' + u[0]] == 0) runner['chk' + u[0]] = u[2];
         });
         runner.save((err, result) => {
           if (err) resolve();
@@ -71,9 +57,7 @@ app.post('/apinaja/addTags', function (req, res) {
       });
     });
     Promise.all(addingTags).then((resolve) => {
-      io.emit('tags', 1);
-      console.log(tags.length + ' tags added.');
-      console.log(hash);
+      io.emit('tagStat', tags.length + ' tags added. ' + stat);
       res.send(hash + '');
     });
   });
@@ -167,11 +151,6 @@ var runnersSchema = new mongoose.Schema({
 }, {
   _id: false
 });
-runnersSchema.statics.findByTag = function (tagId, cb) {
-  return this.findOne({
-    tagId: tagId
-  }, 'tagId chk1 chk2 chk3 isDq updatedAt', cb);
-};
 runnersSchema.statics.findByTags = function (tags, cb) {
   return this.find({
     tagId: {
