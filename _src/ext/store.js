@@ -58,7 +58,7 @@ const store = new Vuex.Store({
     }, message) => {
       //context.
       commit('addMessage', message);
-      axios.get('/apinaja/runnersWithData/' + state.updatedAt).then(resp => {
+      axios.post('/apinaja/runnersWithData/' + state.updatedAt).then(resp => {
         if (resp.data.length > 0) {
           commit('addTags', resp.data);
         }

@@ -44,8 +44,6 @@ app.post('/apinaja/addTags', function (req, res) {
   var updatedAt = new Date().getTime();
   var gunTime = 84;
   runnerModel.findByTags(tag2find, function (err, result) {
-    console.log('result');
-    console.log(result);
     var addingTags = result.map(runner => {
       return new Promise((resolve, reject) => {
         var related = tags.filter(t => {
@@ -103,7 +101,7 @@ app.post('/apinaja/resetRace', function (req, res) {
     });
   });
 });
-app.get('/apinaja/runners/:updatedAt', function (req, res) {
+app.post('/apinaja/runners/:updatedAt', function (req, res) {
   //console.log('here');
   var ret = [];
   runnerModel.find({
@@ -145,7 +143,7 @@ app.get('/apinaja/runners/:updatedAt', function (req, res) {
     res.send(ret);
   });
 });
-app.get('/apinaja/runnersWithData/:updatedAt', function (req, res) {
+app.post('/apinaja/runnersWithData/:updatedAt', function (req, res) {
   //console.log('here');
   var ret = [];
   runnerModel.find({

@@ -49,7 +49,7 @@ export default {
   methods: {
     getRunner() {
       console.log('getRunner');
-      this.$http.get('/apinaja/runners/' + this.lastUpdate).then(resp => {
+      this.$http.post('/apinaja/runners/' + this.lastUpdate).then(resp => {
         console.log(resp);
         if (resp.data.length > 0)
           this.lastUpdate = resp.data[0].updatedAt;
