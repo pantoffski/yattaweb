@@ -10,11 +10,11 @@
   <table border=1>
     <thead>
       <tr>
-        <td><span :class='sortByTagIdClass()' @click='sortByTagId'>tagId</span></td>
-        <td><span :class='sortBytStampClass()' @click='sortBytStamp'>chk1</span></td>
-        <td><span :class='sortBytStampClass()' @click='sortBytStamp'>chk2</span></td>
-        <td><span :class='sortBytStampClass()' @click='sortBytStamp'>chk3</span></td>
-        <td><span :class='sortBytStampClass()' @click='sortBytStamp'>tStamp</span></td>
+        <td><span :class='columnClass.tagId' @click='setSortBy("tagId")'>tagId</span></td>
+        <td><span :class='columnClass.chk1' @click='setSortBy("chk1")'>chk1</span></td>
+        <td><span :class='columnClass.chk2' @click='setSortBy("chk2")'>chk2</span></td>
+        <td><span :class='columnClass.chk3' @click='setSortBy("chk3")'>chk3</span></td>
+        <td><span :class='columnClass.updatedAt' @click='setSortBy("updatedAt")'>updatedAt</span></td>
       </tr>
     </thead>
     <tbody>
@@ -34,7 +34,7 @@
 import {
   mapState,
   mapGetters,
-  mapActions
+  mapMutations
 } from 'vuex';
 export default {
   name: 'raceViewer',
@@ -42,8 +42,15 @@ export default {
     return {
       lastUpdate: 0,
       isUpload: false,
-      sortBy: 2,
-      di: 1
+      sortBy: 'updatedAt',
+      di: 1,
+      columnClass: {
+        tagId: '',
+        chk1: '',
+        chk2: '',
+        chk3: '',
+        updatedAt: 'down'
+      }
     }
   },
   methods: {
@@ -58,6 +65,7 @@ export default {
     resetData() {
       console.log('resetData');
       this.$http.post('/apinaja/resetRace').then(resp => console.log(resp));
+      this.clearTag();
     },
     startRace() {
       console.log('startRace');
@@ -87,54 +95,28 @@ export default {
         status
       }) => console.log(data, status));
     },
-    sortByTagIdClass() {
-      if (this.sortBy == 1) {
-        return (this.sortDi == 1) ? 'up' : 'down';
+    setSortBy(columnName) {
+      for (var i in this.columnClass) {
+        this.columnClass[i] = '';
       }
-    },
-    sortByMatIdClass() {
-      if (this.sortBy == 0) {
-        return (this.sortDi == 1) ? 'up' : 'down';
-      }
-    },
-    sortBytStampClass() {
-      if (this.sortBy == 2) {
-        return (this.sortDi == 1) ? 'up' : 'down';
-      }
-    },
-    sortByMatId(state) {
-      if (this.sortBy != 0) {
-        this.sortBy = 0;
+      if (this.sortBy != columnName) {
+        this.sortBy = columnName;
         this.di = 1;
       } else {
         this.di = this.di * -1;
       }
+      this.columnClass[this.sortBy] = (this.di == 1) ? 'down' : 'up';
     },
-    sortByTagId(state) {
-      if (this.sortBy != 1) {
-        this.sortBy = 1;
-        this.di = 1;
-      } else {
-        this.di = this.di * -1;
-      }
-    },
-    sortBytStamp(state) {
-      if (this.sortBy != 2) {
-        this.sortBy = 2;
-        this.di = 1;
-      } else {
-        this.di = this.di * -1;
-      }
-    }
+    ...mapMutations(['clearTag'])
   },
   mounted() {},
   computed: {
     sortedTags() {
-      return this.tags;
       var idx = this.sortBy;
+      var di = this.di;
       return this.tags.sort(function(a, b) {
         if (a[idx] === b[idx]) return 0;
-        return (a[idx] < b[idx]) ? 1 * this.di : -1 * this.di;
+        return (a[idx] * 1 < b[idx] * 1) ? 1 * di : -1 * di;
       });
     },
     ...mapState({

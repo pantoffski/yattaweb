@@ -13,15 +13,7 @@ const store = new Vuex.Store({
     tags: [],
     message: []
   },
-  getters: {
-    sortedTags: state => {
-      var idx = state.sortBy;
-      return state.tags.sort(function (a, b) {
-        if (a[idx] === b[idx]) return 0;
-        return (a[idx] < b[idx]) ? 1 * state.di : -1 * state.di;
-      });
-    }
-  },
+  getters: {},
   mutations: {
     SOCKET_CONNECT: (state, status) => {
       state.isConnected = true;
@@ -35,17 +27,20 @@ const store = new Vuex.Store({
       msg = msg.splice(0, 20);
       state.message = msg;
     },
+    clearTag: (state, tags) => {
+      state.tags = []
+    },
     addTags: (state, tags) => {
       state.updatedAt = tags[0].updatedAt;
       var ret = state.tags;
       var toAdd = [];
       for (var i in tags) {
         var tagId = tags[i].tagId;
-        var idx=ret.findIndex(aTag => aTag.tagId == tagId);
-        if (idx <0) {
+        var idx = ret.findIndex(aTag => aTag.tagId == tagId);
+        if (idx < 0) {
           toAdd.push(tags[i]);
-        }else{
-          ret[idx]=tags[i];
+        } else {
+          ret[idx] = tags[i];
         }
       }
       state.tags = [...ret, ...toAdd];
