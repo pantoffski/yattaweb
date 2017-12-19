@@ -8,6 +8,7 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const redis = require("redis");
+console.log('REDISCLOUD_URL',process.env.REDISCLOUD_URL);
 redisClient = redis.createClient(process.env.REDISCLOUD_URL, {
   no_ready_check: true
 });
