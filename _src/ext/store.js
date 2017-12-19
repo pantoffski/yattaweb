@@ -49,16 +49,22 @@ const store = new Vuex.Store({
   actions: {
     socket_tagStat: ({
       commit,
-      state
+      dispatch
     }, message) => {
       //context.
       commit('addMessage', message);
+      dispatch('getData');
+      //console.log('tagStat',message);
+    },
+    getData: ({
+      commit,
+      state
+    }) => {
       axios.post('/apinaja/runnersWithData/' + state.updatedAt).then(resp => {
         if (resp.data.length > 0) {
           commit('addTags', resp.data);
         }
       });
-      //console.log('tagStat',message);
     }
   }
 });
