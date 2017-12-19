@@ -11,7 +11,7 @@ const store = new Vuex.Store({
     di: 1,
     updatedAt: 0,
     tags: [],
-    message:[]
+    message: []
   },
   getters: {
     sortedTags: state => {
@@ -25,35 +25,44 @@ const store = new Vuex.Store({
   mutations: {
     SOCKET_CONNECT: (state, status) => {
       state.isConnected = true;
-      state.needInitRaceName = true;
     },
     SOCKET_DISCONNECT: (state, status) => {
       //console.log('disconnected');
       state.isConnected = false;
     },
-    SOCKET_TAGS: (state, tags) => {
-      //console.log('new tags!!');
-      state.tags = [...state.tags, ...tags];
+    addMessage: (state, message) => {
+      var msg = [message, ...state.message];
+      msg = msg.splice(0, 20);
+      state.message = msg;
     },
-    SOCKET_CLEARTAGS: (state, data) => {
-      //console.log('clear tags!!');
-      state.tags = [];
-    },
-    SOCKET_CURRTAGS: (state, tags) => {
-      //console.log('current tags!!');
-      state.tags = tags;
-    },
-    addMessage:(state,message)=>{
-      var msg=[message,...state.message];
-      msg=msg.splice(0,20);
-      state.message=msg;
+    addTags: (state, tags) => {
+      state.updatedAt = tags[0].updatedAt;
+      var ret = state.tags;
+      var toAdd = [];
+      for (var i in tags) {
+        var tagId = tags[i].tagId;
+        var idx=ret.findIndex(aTag => aTag.tagId == tagId);
+        if (idx <0) {
+          toAdd.push(tags[i]);
+        }else{
+          ret[idx]=tags[i];
+        }
+      }
+      state.tags = [...ret, ...toAdd];
     }
   },
   actions: {
-    socket_tagStat: (context, message) => {
+    socket_tagStat: ({
+      commit,
+      state
+    }, message) => {
       //context.
-      context.commit('addMessage',message);
-      console.log(context);
+      commit('addMessage', message);
+      axios.get('/apinaja/runnersWithData/' + state.updatedAt).then(resp => {
+        if (resp.data.length > 0) {
+          commit('addTags', resp.data);
+        }
+      });
       //console.log('tagStat',message);
     }
   }

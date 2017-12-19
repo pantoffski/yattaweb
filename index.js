@@ -43,6 +43,8 @@ app.post('/apinaja/addTags', function (req, res) {
   var updatedAt = new Date().getTime();
   var gunTime = 84;
   runnerModel.findByTags(tag2find, function (err, result) {
+    console.log('result');
+    console.log(result);
     var addingTags = result.map(runner => {
       return new Promise((resolve, reject) => {
         var related = tags.filter(t => {
@@ -52,6 +54,7 @@ app.post('/apinaja/addTags', function (req, res) {
         });
         runner.updatedAt = updatedAt;
         related.forEach((u, idx) => {
+          console.log(u);
           if (runner['chk' + u[0]] == 0) runner['chk' + u[0]] = u[2];
         });
         runner.save((err, result) => {
@@ -110,6 +113,45 @@ app.get('/apinaja/runners/:updatedAt', function (req, res) {
       $gte: req.params.updatedAt
     }
   }).select({
+    tagId: 1,
+    bib_number: 1,
+    name_on_bib: 1,
+    first_name: 1,
+    last_name: 1,
+    raceCat: 1,
+    chk1: 1,
+    chk2: 1,
+    chk3: 1,
+    isDq: 1,
+    updatedAt: 1
+  }).sort({
+    updatedAt: -1
+  }).exec(function (err, result) {
+    for (var i in result) {
+      ret.push({
+        tagId: result[i].tagId * 1,
+        bibNo: result[i].bib_number * 1,
+        bibName: result[i].name_on_bib,
+        name: result[i].first_name + ' ' + result[i].last_name,
+        raceCat: result[i].raceCat,
+        chk1: result[i].chk1,
+        chk2: result[i].chk2,
+        chk3: result[i].chk3,
+        isDq: result[i].isDq,
+        updatedAt: result[i].updatedAt
+      })
+    }
+    res.send(ret);
+  });
+});
+app.get('/apinaja/runnersWithData/:updatedAt', function (req, res) {
+  //console.log('here');
+  var ret = [];
+  runnerModel.find({
+$and: [
+  { $or: [{   chk1: {$gt: 0}}, {chk2: {$gt: 0}}, {chk3: {$gt: 0}}]},
+  {updatedAt: {$gte: req.params.updatedAt}}]
+}).select({
     tagId: 1,
     bib_number: 1,
     name_on_bib: 1,

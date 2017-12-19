@@ -10,16 +10,20 @@
   <table border=1>
     <thead>
       <tr>
-        <td><span :class='sortByMatIdClass()' @click='sortByMatId'>matId</span></td>
         <td><span :class='sortByTagIdClass()' @click='sortByTagId'>tagId</span></td>
+        <td><span :class='sortBytStampClass()' @click='sortBytStamp'>chk1</span></td>
+        <td><span :class='sortBytStampClass()' @click='sortBytStamp'>chk2</span></td>
+        <td><span :class='sortBytStampClass()' @click='sortBytStamp'>chk3</span></td>
         <td><span :class='sortBytStampClass()' @click='sortBytStamp'>tStamp</span></td>
       </tr>
     </thead>
     <tbody>
       <tr v-for="(aTag,index) in sortedTags" :key="index">
-        <td>{{aTag[0]}}</td>
-        <td>{{aTag[1]}}</td>
-        <td>{{aTag[2]}}</td>
+        <td>{{aTag.tagId}}</td>
+        <td>{{aTag.chk1}}</td>
+        <td>{{aTag.chk2}}</td>
+        <td>{{aTag.chk3}}</td>
+        <td>{{aTag.updatedAt}}</td>
       </tr>
     </tbody>
   </table>
@@ -125,7 +129,8 @@ export default {
   },
   mounted() {},
   computed: {
-    sortedTags(){
+    sortedTags() {
+      return this.tags;
       var idx = this.sortBy;
       return this.tags.sort(function(a, b) {
         if (a[idx] === b[idx]) return 0;
