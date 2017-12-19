@@ -32,7 +32,6 @@ new Vue({
   ,
   created() {
     console.log('app created');
-    this.$store.dispatch('init');
   }
 })
 // window.App=App;

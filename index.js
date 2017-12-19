@@ -7,6 +7,10 @@ const app = express();
 // var history = require('connect-history-api-fallback');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
+const redis = require("redis");
+redisClient = redis.createClient(process.env.REDISCLOUD_URL, {
+  no_ready_check: true
+});
 app.set('port', (process.env.PORT || 5000));
 var root = __dirname + '/public';
 app.use(express.static('public'));
@@ -62,112 +66,17 @@ app.post('/apinaja/addTags', function (req, res) {
     });
   });
 });
-app.post('/apinaja/cleanData', function (req, res) {
-  console.log('cleanData');
-  var mongo = require('mongodb');
-  var MongoClient = mongo.MongoClient;
-  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
-    if (err) {
-      res.send('db error');
-      return false;
-    }
-    res.send('db ok');
-    db.collection('runners').find({
-      tagId: {
-        $ne: null
-      }
-    }).project({
-      bib_number: 1,
-      tagId: 1
-    }).forEach(r => {
-      console.log(r);
-      db.collection('runners').update({
-        _id: r._id
-      }, {
-        $set: {
-          tagIdd: r.tagId * 1
-        }
-      });
-    });
-  });
+app.post('/apinaja/startRace', function (req, res) {
+  redisClient.set('startTime', req.body.startTime);
+  res.send('ok ' + req.body.startTime);
 });
-app.post('/apinaja/cleanData4', function (req, res) {
-  console.log('cleanData');
-  var mongo = require('mongodb');
-  var MongoClient = mongo.MongoClient;
-  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
-    if (err) {
-      res.send('db error');
+app.post('/apinaja/getStartTime', function (req, res) {
+  redisClient.get('startTime', function (err, t) {
+    if (err || typeof t == 'undefined' || !t) {
+      res.send('0');
       return false;
     }
-    res.send('db ok');
-    db.collection('runners').find({
-      tagId: {
-        $eq: NaN
-      }
-    }).project({
-      bib_number: 1,
-    }).forEach(r => {
-      console.log(r);
-      db.collection('runners').update({
-        _id: r._id
-      }, {
-        $unset: {
-          tagId: 1
-        }
-      });
-    });
-  });
-});
-app.post('/apinaja/cleanData5', function (req, res) {
-  console.log('cleanData');
-  var mongo = require('mongodb');
-  var MongoClient = mongo.MongoClient;
-  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
-    if (err) {
-      res.send('db error');
-      return false;
-    }
-    res.send('db ok');
-    db.collection('runners').updateMany({}, {
-      $unset: {
-        isDq: 1
-      }
-    });
-  });
-});
-app.post('/apinaja/cleanData2', function (req, res) {
-  console.log('cleanData');
-  var mongo = require('mongodb');
-  var MongoClient = mongo.MongoClient;
-  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
-    if (err) {
-      res.send('db error');
-      return false;
-    }
-    res.send('db ok');
-    db.collection('runners').updateMany({}, {
-      $unset: {
-        tagId: 1
-      }
-    });
-  });
-});
-app.post('/apinaja/cleanData3', function (req, res) {
-  console.log('cleanData');
-  var mongo = require('mongodb');
-  var MongoClient = mongo.MongoClient;
-  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
-    if (err) {
-      res.send('db error');
-      return false;
-    }
-    res.send('db ok');
-    db.collection('runners').updateMany({}, {
-      $rename: {
-        "tagIdd": "tagId"
-      }
-    });
+    res.send(t);
   });
 });
 app.post('/apinaja/resetRace', function (req, res) {
@@ -184,9 +93,52 @@ app.post('/apinaja/resetRace', function (req, res) {
         updatedAt: new Date().getTime(),
         chk1: 0,
         chk2: 0,
-        chk3: 0
+        chk3: 0,
+        isDq: true
       }
     });
+  });
+});
+app.get('/apinaja/runners/:updatedAt', function (req, res) {
+  //console.log('here');
+  var ret = [];
+  runnerModel.find({
+    tagId: {
+      $nin: ['', null]
+    },
+    updatedAt: {
+      $gte: req.params.updatedAt
+    }
+  }).select({
+    tagId: 1,
+    bib_number: 1,
+    name_on_bib: 1,
+    first_name: 1,
+    last_name: 1,
+    raceCat: 1,
+    chk1: 1,
+    chk2: 1,
+    chk3: 1,
+    isDq: 1,
+    updatedAt: 1
+  }).sort({
+    updatedAt: -1
+  }).exec(function (err, result) {
+    for (var i in result) {
+      ret.push({
+        tagId: result[i].tagId * 1,
+        bibNo: result[i].bib_number * 1,
+        bibName: result[i].name_on_bib,
+        name: result[i].first_name + ' ' + result[i].last_name,
+        raceCat: result[i].raceCat,
+        chk1: result[i].chk1,
+        chk2: result[i].chk2,
+        chk3: result[i].chk3,
+        isDq: result[i].isDq,
+        updatedAt: result[i].updatedAt
+      })
+    }
+    res.send(ret);
   });
 });
 //socket io
@@ -228,7 +180,7 @@ var runnersSchema = new mongoose.Schema({
     type: String
   },
   tagId: {
-    type: String,
+    type: Number,
     index: true
   },
   name_on_bib: {
@@ -245,6 +197,10 @@ var runnersSchema = new mongoose.Schema({
   },
   chk3: {
     type: Number,
+    index: true
+  },
+  isDq: {
+    type: Boolean,
     index: true
   },
   updatedAt: {

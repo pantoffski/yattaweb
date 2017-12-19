@@ -7,7 +7,7 @@ export default new Router({
   mode: 'history',
   base: '/',
   routes: [{
-    path: '/:raceName/',
+    path: '/cmd',
     name: 'raceViewer',
     component: raceViewer,
     props: true
