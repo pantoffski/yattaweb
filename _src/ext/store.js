@@ -23,6 +23,8 @@ const store = new Vuex.Store({
       state.isConnected = false;
     },
     addMessage: (state, message) => {
+      var d=new Date();
+      message=d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()+' - '+message;
       var msg = [message, ...state.message];
       msg = msg.splice(0, 20);
       state.message = msg;

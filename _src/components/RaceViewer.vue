@@ -2,8 +2,12 @@
 <div id='raceViewer'>
   <h3 :class="(isConnected?'connected':'')">cmd center</h3><br/> tags : {{sortedTags.length}}
   <br/><br/>
-  <button @click='getRunner'>getRunner</button>
-  <button @click='getStartTime'>getStartTime</button>
+  <div class='logContainer'>
+    <div v-for="m in message">{{m}}</div>
+  </div>
+  <br/><br/>
+  <!-- <button @click='getRunner'>getRunner</button>
+  <button @click='getGunTime'>getGunTime</button> -->
   <button @click='startRace'>startRace</button>
   <button @click='resetData'>resetData</button>
   <br/>
@@ -15,6 +19,7 @@
         <td><span :class='columnClass.chk2' @click='setSortBy("chk2")'>chk2</span></td>
         <td><span :class='columnClass.chk3' @click='setSortBy("chk3")'>chk3</span></td>
         <td><span :class='columnClass.updatedAt' @click='setSortBy("updatedAt")'>updatedAt</span></td>
+        <td><span :class='columnClass.isDq' @click='setSortBy("isDq")'>isDq</span></td>
       </tr>
     </thead>
     <tbody>
@@ -24,6 +29,7 @@
         <td>{{aTag.chk2}}</td>
         <td>{{aTag.chk3}}</td>
         <td>{{aTag.updatedAt}}</td>
+        <td>{{aTag.isDq}}</td>
       </tr>
     </tbody>
   </table>
@@ -49,7 +55,8 @@ export default {
         chk1: '',
         chk2: '',
         chk3: '',
-        updatedAt: 'down'
+        updatedAt: 'down',
+        isDq: ''
       }
     }
   },
@@ -70,30 +77,12 @@ export default {
     startRace() {
       console.log('startRace');
       this.$http.post('/apinaja/startRace', {
-        startTime: new Date().getTime()
+        gunTime: new Date().getTime()
       }).then(resp => console.log(resp));
     },
-    getStartTime() {
+    getGunTime() {
       console.log('startRace');
-      this.$http.post('/apinaja/getStartTime').then(resp => console.log(resp));
-    },
-    addTags() {
-      console.log('addTags');
-      this.$http.post('/apinaja/addTags', {
-        stat: '3 tags remain',
-        tags: [
-          [1, 1, 666],
-          [1, 2, 1666],
-          [2, 4, 2666],
-          [1, 4, 3666],
-          [2, 5, 4666],
-          [2, 6, 4666]
-        ],
-        foo: 'bar'
-      }).then(({
-        data,
-        status
-      }) => console.log(data, status));
+      this.$http.post('/apinaja/getGunTime').then(resp => console.log(resp));
     },
     setSortBy(columnName) {
       for (var i in this.columnClass) {
@@ -121,7 +110,8 @@ export default {
     },
     ...mapState({
       isConnected: state => state.isConnected,
-      tags: state => state.tags
+      tags: state => state.tags,
+      message: state => state.message
     })
   },
   watch: {},
@@ -131,6 +121,11 @@ export default {
 
 <style lang='less' >
 #raceViewer {
+  .logContainer{
+    border: 1px solid black;
+    height:100px;
+    overflow: auto;
+  }
     h3 {
         position: relative;
         display: inline-block;

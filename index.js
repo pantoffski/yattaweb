@@ -8,7 +8,7 @@ const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const redis = require("redis");
-console.log('REDISCLOUD_URL',process.env.REDISCLOUD_URL);
+console.log('REDISCLOUD_URL', process.env.REDISCLOUD_URL);
 redisClient = redis.createClient(process.env.REDISCLOUD_URL, {
   no_ready_check: true
 });
@@ -37,43 +37,92 @@ app.use(function (req, res, next) {
 app.post('/apinaja/addTags', function (req, res) {
   var tags = req.body.tags;
   var stat = req.body.stat;
-  console.log(tags);
   if (!Array.isArray(tags)) tags = JSON.parse(tags);
+  console.log('addingTags '+tags.length);
+  //console.log(tags);
   var hash = md5(JSON.stringify(tags));
   var tag2find = [...new Set(tags.map(t => t[1]))];
   var updatedAt = new Date().getTime();
-  var gunTime = 84;
-  runnerModel.findByTags(tag2find, function (err, result) {
-    var addingTags = result.map(runner => {
-      return new Promise((resolve, reject) => {
-        var related = tags.filter(t => {
-          return t[1] == runner.tagId
-        }).sort((a, b) => {
-          return (a[0] == b[0]) ? 0 : ((a[0] < b[0] ? -1 : 1))
-        });
-        runner.updatedAt = updatedAt;
-        related.forEach((u, idx) => {
-          console.log(u);
-          if (runner['chk' + u[0]] == 0) runner['chk' + u[0]] = u[2];
-        });
-        runner.save((err, result) => {
-          if (err) resolve();
-          else resolve(runner.tagId);
+  var gunTime = 0;
+  redisClient.get('gunTime', function (err, t) {
+    if (err || typeof t == 'undefined' || !t) {
+      gunTime = 0;
+    } else {
+      gunTime = t * 1;
+    }
+    runnerModel.findByTags(tag2find, function (err, result) {
+      if (err || !result) {
+        res.send('error');
+        return false;
+      }
+      var addingTags = result.map(runner => {
+        return new Promise((resolve, reject) => {
+          var related = tags.filter(t => {
+            return t[1] == runner.tagId
+          }).sort((a, b) => {
+            return (a[0] == b[0]) ? 0 : ((a[0] < b[0] ? -1 : 1))
+          });
+          runner.updatedAt = updatedAt;
+          related.forEach((u, idx) => {
+            if (u[0] == 1 && runner.chk1 == 0) {
+              runner.chk1 = (u[2] < gunTime) ? gunTime : u[2];
+            }
+            if (u[0] == 2 && runner.chk2 == 0) {
+              runner.chk2 = u[2];
+            }
+            if (u[0] == 3 && runner.chk3 == 0) {
+              runner.chk3 = u[2];
+              if (runner.chk3 > runner.chk2 && runner.chk2 > runner.chk1 && runner.chk1 > 0 && runner.chk2 > 0 && runner.chk3 > 0) runner.isDq = false;
+            }
+          });
+          runner.save((err, result) => {
+            if (err) resolve();
+            else resolve(runner.tagId);
+          });
         });
       });
-    });
-    Promise.all(addingTags).then((resolve) => {
-      io.emit('tagStat', tags.length + ' tags added. ' + stat);
-      res.send(hash + '');
+      Promise.all(addingTags).then((resolve) => {
+        io.emit('tagStat', tags.length + ' tags added. ' + stat);
+        res.send(hash + '');
+      });
     });
   });
 });
 app.post('/apinaja/startRace', function (req, res) {
-  redisClient.set('startTime', req.body.startTime);
-  res.send('ok ' + req.body.startTime);
+  redisClient.set('gunTime', req.body.gunTime);
+  var mongo = require('mongodb');
+  var MongoClient = mongo.MongoClient;
+  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
+    if (err) {
+      res.send('error');
+      return false;
+    }
+    res.send('ok ' + req.body.gunTime);
+    var gunTime = req.body.gunTime * 1;
+    db.collection('runners').updateMany({
+      $and: [{
+        tagId: {
+          $nin: ['', null]
+        }
+      }, {
+        chk1: {
+          $gt: 0
+        }
+      }, {
+        chk1: {
+          $lt: gunTime
+        }
+      }]
+    }, {
+      $set: {
+        updatedAt: new Date().getTime(),
+        chk1: gunTime
+      }
+    });
+  });
 });
-app.post('/apinaja/getStartTime', function (req, res) {
-  redisClient.get('startTime', function (err, t) {
+app.post('/apinaja/getGunTime', function (req, res) {
+  redisClient.get('gunTime', function (err, t) {
     if (err || typeof t == 'undefined' || !t) {
       res.send('0');
       return false;
@@ -147,10 +196,26 @@ app.post('/apinaja/runnersWithData/:updatedAt', function (req, res) {
   //console.log('here');
   var ret = [];
   runnerModel.find({
-$and: [
-  { $or: [{   chk1: {$gt: 0}}, {chk2: {$gt: 0}}, {chk3: {$gt: 0}}]},
-  {updatedAt: {$gte: req.params.updatedAt}}]
-}).select({
+    $and: [{
+      $or: [{
+        chk1: {
+          $gt: 0
+        }
+      }, {
+        chk2: {
+          $gt: 0
+        }
+      }, {
+        chk3: {
+          $gt: 0
+        }
+      }]
+    }, {
+      updatedAt: {
+        $gte: req.params.updatedAt
+      }
+    }]
+  }).select({
     tagId: 1,
     bib_number: 1,
     name_on_bib: 1,
