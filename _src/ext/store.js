@@ -30,7 +30,8 @@ const store = new Vuex.Store({
       state.message = msg;
     },
     clearTag: (state, tags) => {
-      state.tags = []
+      state.tags = [];
+      state.message=[];
     },
     addTags: (state, tags) => {
       state.updatedAt = tags[0].updatedAt;
