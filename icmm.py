@@ -139,24 +139,25 @@ def readTag():
                 cmd = rxBuff[:cmdLen]
                 rxBuff = rxBuff[cmdLen:]
                 if(chkSum(cmd[:cmdLen - 1]) == cmd[cmdLen - 1]):
-                    # old tags
-                    #if(len(cmd) == 21):
-                        #tagId=(cmd[17] * 256 + cmd[18]) % 5000
+                    # old tags // plz del b4 production
+                    if(len(cmd) == 21):
+                        tagId=(cmd[17] * 256 + cmd[18]) % 5000
+                        ts = tStamp()
+                        bank[bankIdx].append((matId, tagId, ts))
+                    #new tags
                     if(len(cmd) == 11):
-                        #print("".join([hex(r).replace('0x', '').zfill(2) for r in cmd[7:9]]))
-                        #print(int("".join([hex(r).replace('0x', '').zfill(2) for r in cmd[7:9]])))
                         tagId = int(
                             "".join([hex(r).replace('0x', '').zfill(2) for r in cmd[7:9]]))
                         ts = tStamp()
-                        #print('new tag! {}'.format(tagId))
                         bank[bankIdx].append((matId, tagId, ts))
-                        if(len(bank[bankIdx]) > 0 and save2dbThread.isAlive() == False):
-                            save2dbThread = Thread(
-                                target=save2db, args=(bank[bankIdx],))
-                            save2dbThread.daemon = True
-                            save2dbThread.start()
-                            bankIdx = (bankIdx + 1) % 2
-                            bank[bankIdx] = []
+                    #save tags to sqlite
+                    if(len(bank[bankIdx]) > 0 and save2dbThread.isAlive() == False):
+                        save2dbThread = Thread(
+                            target=save2db, args=(bank[bankIdx],))
+                        save2dbThread.daemon = True
+                        save2dbThread.start()
+                        bankIdx = (bankIdx + 1) % 2
+                        bank[bankIdx] = []
                     if(len(cmd) == 12):
                         uart.write(fastSwitchCmd)
         except Exception as e:
@@ -212,10 +213,10 @@ try:
             try:
                 inp = int(input("input matId :"))
                 if(inp == 0):
-                    uart.write(serial.to_bytes(makeCmd([0x70])))
+                    uart.write(resetCmd)
                     # uart.close()
                     isRunning = False
-                    time.sleep(2)
+                    time.sleep(1)
                     raise SystemExit
                 if(inp > 0):
                     matId = inp

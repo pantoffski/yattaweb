@@ -38,7 +38,7 @@ app.post('/apinaja/addTags', function (req, res) {
   var tags = req.body.tags;
   var stat = req.body.stat;
   if (!Array.isArray(tags)) tags = JSON.parse(tags);
-  console.log('addingTags '+tags.length);
+  console.log('addingTags ' + tags.length);
   //console.log(tags);
   var hash = md5(JSON.stringify(tags));
   var tag2find = [...new Set(tags.map(t => t[1]))];
@@ -69,10 +69,10 @@ app.post('/apinaja/addTags', function (req, res) {
             }
             if (u[0] == 2 && runner.chk2 == 0) {
               runner.chk2 = u[2];
-            }
-            if (u[0] == 3 && runner.chk3 == 0) {
-              runner.chk3 = u[2];
-              if (runner.chk3 > runner.chk2 && runner.chk2 > runner.chk1 && runner.chk1 > 0 && runner.chk2 > 0 && runner.chk3 > 0) runner.isDq = false;
+              if (runner.chk2 == 0) {
+                runner.isFakeStart = true;
+                runner.chk1 = gunTime;
+              }
             }
           });
           runner.save((err, result) => {
@@ -144,8 +144,7 @@ app.post('/apinaja/resetRace', function (req, res) {
         updatedAt: new Date().getTime(),
         chk1: 0,
         chk2: 0,
-        chk3: 0,
-        isDq: true
+        isFakeStart: false
       }
     });
   });
@@ -169,8 +168,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
     raceCat: 1,
     chk1: 1,
     chk2: 1,
-    chk3: 1,
-    isDq: 1,
+    isFakeStart: 1,
     updatedAt: 1
   }).sort({
     updatedAt: -1
@@ -184,8 +182,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
         raceCat: result[i].raceCat,
         chk1: result[i].chk1,
         chk2: result[i].chk2,
-        chk3: result[i].chk3,
-        isDq: result[i].isDq,
+        isFakeStart: result[i].isFakeStart,
         updatedAt: result[i].updatedAt
       })
     }
@@ -205,10 +202,6 @@ app.post('/apinaja/runnersWithData/:updatedAt', function (req, res) {
         chk2: {
           $gt: 0
         }
-      }, {
-        chk3: {
-          $gt: 0
-        }
       }]
     }, {
       updatedAt: {
@@ -224,8 +217,7 @@ app.post('/apinaja/runnersWithData/:updatedAt', function (req, res) {
     raceCat: 1,
     chk1: 1,
     chk2: 1,
-    chk3: 1,
-    isDq: 1,
+    isFakeStart: 1,
     updatedAt: 1
   }).sort({
     updatedAt: -1
@@ -239,8 +231,7 @@ app.post('/apinaja/runnersWithData/:updatedAt', function (req, res) {
         raceCat: result[i].raceCat,
         chk1: result[i].chk1,
         chk2: result[i].chk2,
-        chk3: result[i].chk3,
-        isDq: result[i].isDq,
+        isFakeStart: result[i].isFakeStart,
         updatedAt: result[i].updatedAt
       })
     }
@@ -301,13 +292,8 @@ var runnersSchema = new mongoose.Schema({
   chk2: {
     type: Number
   },
-  chk3: {
-    type: Number,
-    index: true
-  },
-  isDq: {
-    type: Boolean,
-    index: true
+  isFakeStart: {
+    type: Boolean
   },
   updatedAt: {
     type: Number,
@@ -321,6 +307,6 @@ runnersSchema.statics.findByTags = function (tags, cb) {
     tagId: {
       $in: tags
     }
-  }, 'tagId chk1 chk2 chk3 updatedAt', cb);
+  }, 'tagId chk1 chk2 updatedAt', cb);
 };
 var runnerModel = mongoose.model('runner', runnersSchema);
