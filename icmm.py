@@ -141,16 +141,16 @@ def readTag():
                 if(chkSum(cmd[:cmdLen - 1]) == cmd[cmdLen - 1]):
                     # old tags // plz del b4 production
                     if(len(cmd) == 21):
-                        tagId=(cmd[17] * 256 + cmd[18]) % 5000
+                        tagId = (cmd[17] * 256 + cmd[18]) % 5000
                         ts = tStamp()
                         bank[bankIdx].append((matId, tagId, ts))
-                    #new tags
+                    # new tags
                     if(len(cmd) == 11):
                         tagId = int(
                             "".join([hex(r).replace('0x', '').zfill(2) for r in cmd[7:9]]))
                         ts = tStamp()
                         bank[bankIdx].append((matId, tagId, ts))
-                    #save tags to sqlite
+                    # save tags to sqlite
                     if(len(bank[bankIdx]) > 0 and save2dbThread.isAlive() == False):
                         save2dbThread = Thread(
                             target=save2db, args=(bank[bankIdx],))
@@ -182,10 +182,11 @@ fastSwitchCmd = makeCmd([0x8A, 0x00, stay, 0x03, stay,
 resetCmd = makeCmd([0x70])
 getPowerCmd = makeCmd([0x77])
 resetCmd = makeCmd([0x70])
-powerCmd = makeCmd([0x76, 0x21, 0x20, 0x19, 0x18])
+powerCmd = makeCmd([0x76, 0x1E])
 getFreqCmd = makeCmd([0x79])
 freqLowCmd = makeCmd([0x78, 0x01, 0x07, 0x11])
 freqHighCmd = makeCmd([0x78, 0x01, 0x2B, 0x35])
+freqFCCCmd = makeCmd([0x78, 0x01, 0x07, 0x3B])  # Full FCC 902-928MHz
 
 db = sqlite3.connect(connectionString)
 conn = db.cursor()
