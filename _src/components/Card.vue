@@ -13,7 +13,7 @@ export default {
   watch: {
     isClear(val) {
       if (val) {
-        setTimeout(()=>{
+        setTimeout(_=>{
           if (Math.random() > 0.5)
             this.cardClass = 'fadeLeft';
           else

@@ -1,5 +1,5 @@
 <template>
-<div class="cardContainer" :style='cardContainerStyle'>
+<div class="cardContainer" :style="{left:left+'px',top:top+'px'}">
   <card v-if='index<=dispIdx' :key='index' :char='char' :isClear='isClear' v-for='(char,index) in cards' />
 </div>
 </template>
@@ -12,7 +12,6 @@ export default {
     return {
       cards: [],
       dispIdx: -1,
-      tmer: null,
     }
   },
   watch: {
@@ -22,14 +21,6 @@ export default {
       setTimeout(_ => {
         this.aniLoop();
       }, this.startDelay);
-    }
-  },
-  computed: {
-    cardContainerStyle() {
-      return {
-        left: this.left + 'px',
-        top: this.top + 'px'
-      }
     }
   },
   methods: {
