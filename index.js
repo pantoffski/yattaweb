@@ -15,12 +15,6 @@ redisClient = redis.createClient(process.env.REDISCLOUD_URL, {
 app.set('port', (process.env.PORT || 5000));
 var root = __dirname + '/public';
 app.use(express.static('public'));
-// app.use(history({
-//   rewrites: [{
-//     from: /\/foo/,
-//     to: '/bar'
-//   }]
-// }));
 app.use(history({
   disableDotRule: true,
   verbose: true
