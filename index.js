@@ -295,6 +295,10 @@ var runnersSchema = new mongoose.Schema({
   isFakeStart: {
     type: Boolean
   },
+  tag: {
+    type: String,
+    index: true
+  },
   updatedAt: {
     type: Number,
     index: true

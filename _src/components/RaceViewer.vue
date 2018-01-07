@@ -10,6 +10,7 @@
   <button @click='getGunTime'>getGunTime</button> -->
   <button @click='startRace'>startRace</button>
   <button @click='resetData'>resetData</button>
+  <button @click='addTagColumn'>addTagColumn</button>
   <br/>
   <table border=1>
     <thead>
@@ -68,6 +69,10 @@ export default {
         if (resp.data.length > 0)
           this.lastUpdate = resp.data[0].updatedAt;
       });
+    },
+    addTagColumn() {
+      console.log('addTagColumn');
+      this.$http.post('/apinaja/addTagColumn').then(resp => console.log(resp));
     },
     resetData() {
       console.log('resetData');
