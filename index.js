@@ -4,7 +4,7 @@ var md5 = require('md5');
 const bodyParser = require('body-parser')
 const express = require('express');
 const app = express();
-// var history = require('connect-history-api-fallback');
+var history = require('connect-history-api-fallback');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const redis = require("redis");
@@ -21,6 +21,10 @@ app.use(express.static('public'));
 //     to: '/bar'
 //   }]
 // }));
+app.use(history({
+  disableDotRule: true,
+  verbose: true
+}));
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({
   extended: true
