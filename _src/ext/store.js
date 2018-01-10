@@ -63,7 +63,7 @@ const store = new Vuex.Store({
       commit,
       state
     }) => {
-      axios.post('/apinaja/runnersWithData/' + state.updatedAt).then(resp => {
+      axios.post('/runnersWithData/' + state.updatedAt).then(resp => {
         if (resp.data.length > 0) {
           commit('addTags', resp.data);
         }

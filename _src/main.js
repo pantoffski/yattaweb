@@ -9,17 +9,10 @@ import router from './ext/router.js'
 import store from './ext/store.js'
 import App from './App.vue'
 import VueSocketio from 'vue-socket.io';
-//import vueResource from 'vue-resource'
-// import * as uiv from 'uiv'
-// Vue.use(uiv)
 Vue.use(Vuex);
-//axios.create({baseURL: 'http://localhost:3000/'});
+
+axios.defaults.baseURL = `/apinaja`;
 Vue.prototype.$http = axios;
-//Vue.prototype.$http = axios.create({baseURL: 'http://localhost:3000/'});
-//Vue.http.options.root = 'http://localhost';
-// Vue.config.productionTip = false;
-// Vue.http.options.emulateHTTP = true;
-/* eslint-disable no-new */
 new Vue({
   el: '#app',
   store,

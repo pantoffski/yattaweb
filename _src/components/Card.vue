@@ -1,24 +1,27 @@
 <template>
-<div class='card' :class='cardClass'>{{(char==' ')?'&nbsp;':char}}</div>
+<div class='card' :class='[cardClass,isHide]'>{{(ch==' ')?'&nbsp;':ch}}</div>
 </template>
 <script>
 export default {
   name: 'card',
-  props: ['char', 'isClear'],
+  props: ['ch', 'isClear'],
   data() {
     return {
       cardClass: ''
     }
   },
+  computed:{
+    isHide(){return this.ch==' '?'hide':'show';}
+  },
   watch: {
     isClear(val) {
       if (val) {
-        setTimeout(_=>{
+        setTimeout(_ => {
           if (Math.random() > 0.5)
             this.cardClass = 'fadeLeft';
           else
             this.cardClass = 'fadeRight';
-        },Math.random() * 1000);
+        }, Math.random() * 1000);
       }
     }
   }
@@ -26,28 +29,30 @@ export default {
 </script>
 
 <style lang="less">
-@cardHeight: 60px;
+@cardHeight: 50px;
 .fadeLeft {
     animation: fadeLeftAni 0.5s ease-in forwards !important;
 }
 .fadeRight {
     animation: fadeRightAni 0.5s ease-in forwards !important;
 }
-@font-face{
-  font-family: 'psl';
-  src:url("../css/psl.ttf");
-}
 .card {
+    &.hide {
+        opacity: 0;
+    }
+    &.show{
+      animation: cardAni 1.5s ease-out forwards;
+    }
     font-family: 'psl';
-    background: url("../img/cardBg.jpg");
-    color:white;
-    background:#95313c;
+    // background: url("../img/cardBg.jpg");
+    color: white;
+    background: #95313c;
     position: relative;
     margin: 2px;
     display: inline-block;
     text-transform: uppercase;
     font-size: 40px;
-    width: 40px;
+    width: 29px;
     border-radius: 4px;
     text-align: center;
     height: @cardHeight;
@@ -55,7 +60,6 @@ export default {
     box-shadow: 2px 2px 2px black;
     transform-origin: 50% 15%;
     transform: perspective(100px) rotateY(60deg) rotateX(150deg);
-    animation: cardAni 1.5s ease-out forwards;
     // backface-visibility: hidden;
 }
 @keyframes fadeLeftAni {

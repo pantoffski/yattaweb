@@ -1,13 +1,13 @@
 <template>
 <div class="cardContainer" :style="{left:left+'px',top:top+'px'}">
-  <card v-if='index<=dispIdx' :key='index' :char='char' :isClear='isClear' v-for='(char,index) in cards' />
+  <card v-if='index<=dispIdx' :key='index' :ch='ch' :isClear='isClear' v-for='(ch,index) in cards' />
 </div>
 </template>
 <script>
 import card from '@/components/Card'
 export default {
   name: 'cardContainer',
-  props: ['left', 'top', 'txt', 'delay', 'startDelay','isClear'],
+  props: ['left', 'top', 'txt', 'delay', 'startDelay', 'isClear'],
   data() {
     return {
       cards: [],
@@ -18,16 +18,20 @@ export default {
     txt(val) {
       this.dispIdx = -1;
       this.cards = this.splitString(val);
-      setTimeout(_ => {
-        this.aniLoop();
-      }, this.startDelay);
+      if (val == '') {
+        this.cards = [];
+      } else {
+        setTimeout(() => {
+          this.aniLoop();
+        }, this.startDelay);
+      }
     }
   },
   methods: {
     aniLoop() {
       if (this.dispIdx < this.cards.length) {
         this.dispIdx++;
-        setTimeout(_ => {
+        setTimeout(() => {
           this.aniLoop();
         }, this.delay);
       }
@@ -39,7 +43,7 @@ export default {
       var ctx = document.createElement('canvas').getContext('2d');
       ctx.font = 'monospace 10px;';
       var c = str.split('');
-      tmp = c.splice(0, 1)+'';
+      tmp = c.splice(0, 1) + '';
       currWidth = ctx.measureText(tmp).width;
       while (c.length > 0) {
         var newWidth = ctx.measureText(tmp + c[0]).width;
@@ -52,7 +56,7 @@ export default {
         currWidth = ctx.measureText(tmp).width;
       }
       ret.push(tmp);
-      return ret;
+      return ret.slice(0,28);
     }
   },
   components: {
