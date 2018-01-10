@@ -33,12 +33,18 @@ export default {
 .fadeRight {
     animation: fadeRightAni 0.5s ease-in forwards !important;
 }
+@font-face{
+  font-family: 'psl';
+  src:url("../css/psl.ttf");
+}
 .card {
+    font-family: 'psl';
     background: url("../img/cardBg.jpg");
+    color:white;
+    background:#95313c;
     position: relative;
     margin: 2px;
     display: inline-block;
-    font-family: monospace;
     text-transform: uppercase;
     font-size: 40px;
     width: 40px;
