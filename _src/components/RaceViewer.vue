@@ -11,6 +11,7 @@
   <button @click='startRace'>startRace</button>
   <button @click='resetData'>resetData</button>
   <button @click='addTagColumn'>addTagColumn</button>
+  <button @click='foo'>foo</button>
   <br/>
   <table border=1>
     <thead>
@@ -62,9 +63,14 @@ export default {
     }
   },
   methods: {
+    foo() {
+      this.$http.post('/foo').then(resp => {
+        console.log(resp.data);
+      });
+    },
     getRunner() {
       console.log('getRunner');
-      this.$http.post('/apinaja/runners/' + this.lastUpdate).then(resp => {
+      this.$http.post('/runners/' + this.lastUpdate).then(resp => {
         console.log(resp);
         if (resp.data.length > 0)
           this.lastUpdate = resp.data[0].updatedAt;
@@ -72,22 +78,22 @@ export default {
     },
     addTagColumn() {
       console.log('addTagColumn');
-      this.$http.post('/apinaja/addTagColumn').then(resp => console.log(resp));
+      this.$http.post('/addTagColumn').then(resp => console.log(resp));
     },
     resetData() {
       console.log('resetData');
-      this.$http.post('/apinaja/resetRace').then(resp => console.log(resp));
+      this.$http.post('/resetRace').then(resp => console.log(resp));
       this.clearTag();
     },
     startRace() {
       console.log('startRace');
-      this.$http.post('/apinaja/startRace', {
+      this.$http.post('/startRace', {
         gunTime: new Date().getTime()
       }).then(resp => console.log(resp));
     },
     getGunTime() {
       console.log('startRace');
-      this.$http.post('/apinaja/getGunTime').then(resp => console.log(resp));
+      this.$http.post('/getGunTime').then(resp => console.log(resp));
     },
     setSortBy(columnName) {
       for (var i in this.columnClass) {

@@ -1,18 +1,15 @@
 <template>
-<div>
-  <div id='scoreBoard' :style='boardStyle'>
-    <em :class="['rank',(this.isClear||this.raceCat=='overall')?'hide':'']"><hr/></em>
-    <em :class="['rank',(this.isClear||this.raceCat=='overall')?'hide':'']"><hr/></em>
-    <em :class="['rank',(this.isClear||this.raceCat=='overall')?'hide':'']"><hr/></em>
-    <cardContainer :startDelay='0' :top='192' :txt='winners[0]' :delay='delay' :isClear='isClear' :left='145' />
-    <cardContainer :startDelay='500' :top='258' :txt='winners[1]' :delay='delay' :isClear='isClear' :left='145' />
-    <cardContainer :startDelay='1000' :top='324' :txt='winners[2]' :delay='delay' :isClear='isClear' :left='145' />
-    <cardContainer :startDelay='1500' :top='390' :txt='winners[3]' :delay='delay' :isClear='isClear' :left='145' />
-    <cardContainer :startDelay='2000' :top='456' :txt='winners[4]' :delay='delay' :isClear='isClear' :left='145' />
-    <b v-for='(blub,index) in blubs' key='index' :class='["blub",blub]'></b>
-    <boardHead :raceCat='raceCat' :isClear='isClear' />
-  </div>
-  <div id='guide' :style='boardStyle'></div>
+<div id='scoreBoard' :style='boardStyle'>
+  <em :class="['rank',(this.isClear||this.raceCat=='overall')?'hide':'']"><hr/></em>
+  <em :class="['rank',(this.isClear||this.raceCat=='overall')?'hide':'']"><hr/></em>
+  <em :class="['rank',(this.isClear||this.raceCat=='overall')?'hide':'']"><hr/></em>
+  <cardContainer :startDelay='0' :top='192' :txt='winners[0]' :delay='delay' :isClear='isClear' :left='145' />
+  <cardContainer :startDelay='500' :top='258' :txt='winners[1]' :delay='delay' :isClear='isClear' :left='145' />
+  <cardContainer :startDelay='1000' :top='324' :txt='winners[2]' :delay='delay' :isClear='isClear' :left='145' />
+  <cardContainer :startDelay='1500' :top='390' :txt='winners[3]' :delay='delay' :isClear='isClear' :left='145' />
+  <cardContainer :startDelay='2000' :top='456' :txt='winners[4]' :delay='delay' :isClear='isClear' :left='145' />
+  <b v-for='(blub,index) in blubs' key='index' :class='["blub",blub]'></b>
+  <boardHead :raceCat='raceCat' :isClear='isClear' />
 </div>
 </template>
 <script>
@@ -27,7 +24,7 @@ export default {
       blubTimer: null,
       isClear: true,
       delay: 150,
-      raceCat: '50f',
+      raceCat: 'overall',
       screenWidth: 100,
       screenHeight: 100,
       winners: ['', '', '', '', ''],
@@ -37,7 +34,6 @@ export default {
   methods: {
     dispWinner() {
       for (var i in this.raw) {
-        console.log(i);
         this.isClear = false;
         this.raceCat = i;
         this.winners = ['', '', '', '', ''];
@@ -48,7 +44,7 @@ export default {
         break;
       }
       if (Object.keys(this.raw).length == 1) {
-        this.$http.post('/getOverall').then(resp => {
+        this.$http.post('/raceResult').then(resp => {
           this.raw = resp.data;
         });
       }
@@ -108,7 +104,7 @@ export default {
     this.blubTimer = setInterval(() => {
       this.shiftBlubs();
     }, 600);
-    this.$http.post('/getOverall').then(resp => {
+    this.$http.post('/raceResult').then(resp => {
       this.raw = resp.data;
       this.dispWinner();
     });
@@ -147,6 +143,7 @@ body {
     margin: 0;
     padding: 0;
     counter-reset: rankCounter;
+    overflow: hidden;
 }
 #guide,
 #scoreBoard {
