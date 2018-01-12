@@ -262,7 +262,7 @@ app.post('/apinaja/resetRace', function (req, res) {
     res.send('db ok');
     var updatedAt = new Date().getTime()
     db.collection('matlogs').remove({});
-    db.collection('runners').updateMany({}, {
+    db.collection('runners').updateMany({bib_number:{$neq:1}}, {
       $set: {
         updatedAt: updatedAt,
         chk1: 0,
