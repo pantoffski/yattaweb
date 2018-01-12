@@ -279,7 +279,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
       $nin: ['', null]
     },
     updatedAt: {
-      $gt: req.params.updatedAt
+      $gte: req.params.updatedAt
     }
   }).select({
     tagId: 1,
