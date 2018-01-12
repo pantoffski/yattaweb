@@ -268,7 +268,7 @@ app.post('/apinaja/resetRace', function (req, res) {
       }
     }, {
       $set: {
-        updatedAt: updatedAt,
+        //updatedAt: updatedAt,
         chk1: 0,
         chk2: 0,
         isFakeStart: false
@@ -278,7 +278,7 @@ app.post('/apinaja/resetRace', function (req, res) {
       bib_number: 1
     }, {
       $set: {
-        updatedAt: updatedAt + 1,
+        //updatedAt: updatedAt + 1,
       }
     });
   });
