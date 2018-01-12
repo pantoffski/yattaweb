@@ -65,6 +65,7 @@ export default {
             background: url("../img/a.png");
         }
         &.hide {
+            transition-duration: 0.5s;
             transition-delay: 0.5s;
             transform: rotateY(90deg);
         }
