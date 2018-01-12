@@ -262,7 +262,11 @@ app.post('/apinaja/resetRace', function (req, res) {
     res.send('db ok');
     var updatedAt = new Date().getTime()
     db.collection('matlogs').remove({});
-    db.collection('runners').updateMany({bib_number:{$neq:1}}, {
+    db.collection('runners').updateMany({
+      bib_number: {
+        $ne: 1
+      }
+    }, {
       $set: {
         updatedAt: updatedAt,
         chk1: 0,
@@ -272,9 +276,11 @@ app.post('/apinaja/resetRace', function (req, res) {
     });
     db.collection('runners').updateOne({
       bib_number: 1
-    },{ $set: {
-      updatedAt: updatedAt + 1,
-    }});
+    }, {
+      $set: {
+        updatedAt: updatedAt + 1,
+      }
+    });
   });
 });
 app.post('/apinaja/runners/:updatedAt', function (req, res) {
