@@ -265,7 +265,6 @@ app.post('/apinaja/resetRace', function (req, res) {
       $set: {
         updatedAt: new Date().getTime(),
         chk1: 0,
-        //chk2: tmp + Math.floor(Math.random()*3600) * 1000,
         chk2: 0,
         isFakeStart: false
       }
@@ -280,7 +279,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
       $nin: ['', null]
     },
     updatedAt: {
-      $gte: req.params.updatedAt
+      $gt: req.params.updatedAt
     }
   }).select({
     tagId: 1,

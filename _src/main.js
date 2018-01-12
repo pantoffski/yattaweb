@@ -8,7 +8,6 @@ import Vuex from 'vuex';
 import router from './ext/router.js'
 import store from './ext/store.js'
 import App from './App.vue'
-import VueSocketio from 'vue-socket.io';
 Vue.use(Vuex);
 
 axios.defaults.baseURL = `/apinaja`;
