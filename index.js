@@ -230,12 +230,12 @@ app.post('/apinaja/warp/:bibNo/:m/:s', function (req, res) {
       return false;
     }
     runnerModel.find({
-      bib_number: req.params.bibNo*1
+      bib_number: req.params.bibNo * 1
     }, function (err, result) {
-      var chk2=t*1+(req.params.m*60 +req.params.s*1)*1000;
+      var chk2 = t * 1 + (req.params.m * 60 + req.params.s * 1) * 1000;
       var updatedAt = new Date().getTime();
-      result[0].chk2=chk2;
-      result[0].updatedAt=updatedAt;
+      result[0].chk2 = chk2;
+      result[0].updatedAt = updatedAt;
       result[0].save((err, result) => {});
       res.send(result[0]);
     });
@@ -260,15 +260,21 @@ app.post('/apinaja/resetRace', function (req, res) {
       return false;
     }
     res.send('db ok');
+    var updatedAt = new Date().getTime()
     db.collection('matlogs').remove({});
     db.collection('runners').updateMany({}, {
       $set: {
-        updatedAt: new Date().getTime(),
+        updatedAt: updatedAt,
         chk1: 0,
         chk2: 0,
         isFakeStart: false
       }
     });
+    db.collection('runners').updateOne({
+      bib_number: 1
+    },{ $set: {
+      updatedAt: updatedAt + 1,
+    }});
   });
 });
 app.post('/apinaja/runners/:updatedAt', function (req, res) {
@@ -283,7 +289,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
     }
   }).select({
     tagId: 1,
-    is_alumni:1,
+    is_alumni: 1,
     bib_number: 1,
     name_on_bib: 1,
     first_name: 1,
@@ -300,7 +306,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
     for (var i in result) {
       ret.push({
         tagId: result[i].tagId * 1,
-        e: (result[i].is_alumni=='yes')?'E':' ',
+        e: (result[i].is_alumni == 'yes') ? 'E' : ' ',
         bibNo: result[i].bib_number * 1,
         bibName: result[i].name_on_bib,
         name: result[i].first_name + ' ' + result[i].last_name,
