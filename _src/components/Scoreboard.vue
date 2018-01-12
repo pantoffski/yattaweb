@@ -10,6 +10,10 @@
   <cardContainer :startDelay='2000' :top='456' :txt='winners[4]' :delay='delay' :isClear='isClear' :left='145' />
   <b v-for='(blub,index) in blubs' key='index' :class='["blub",blub]'></b>
   <boardHead :raceCat='raceCat' :isClear='isClear' />
+  <div class='preload'>haha
+    <img src='../img/f.png' />
+    <img src='../img/m.png' />
+  </div>
 </div>
 </template>
 <script>
@@ -152,6 +156,17 @@ body {
     width: 1155px;
     height: 576px;
     background: url("../img/boardBg.png");
+    .preload {
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        display: block;
+        font-family: 'psl';
+        &:after {
+            content: 'haha';
+            font-family: 'pslBold';
+        }
+    }
 }
 #guide {
     // background: url("../img/guide.png");
