@@ -74,7 +74,7 @@ def postToServer():
                 h.update(tags.encode('utf-8'))
                 hashed = h.hexdigest()
                 req = requests.post(yattaUrl + '/addTags',
-                                    data={'tags': tags, 'stat': stat})
+                                    data={'tags': tags, 'stat': stat, 'matName': matName})
                 # print ("srv return {} {}".format(req.text, hashed))
                 if(hashed == req.text):
                     # print('start deleting')
@@ -150,7 +150,6 @@ def readTag():
                             "".join([hex(r).replace('0x', '').zfill(2) for r in cmd[7:9]]))
                         ts = tStamp()
                         bank[bankIdx].append((matId, tagId, ts))
-                    # save tags to sqlite
                     if(len(bank[bankIdx]) > 0 and save2dbThread.isAlive() == False):
                         save2dbThread = Thread(
                             target=save2db, args=(bank[bankIdx],))
@@ -170,10 +169,11 @@ global lastBeat, isRunning, uart
 isRunning = True
 lastBeat = 0
 matAddr = 0x01
+matName = 'left'
 matId = 1
 connectionString = "file:tagDb?mode=memory&cache=shared"
-yattaUrl = 'https://yattaweb.herokuapp.com/apinaja'
-#yattaUrl = 'http://192.168.1.35:3000/apinaja'
+#yattaUrl = 'https://yattaweb.herokuapp.com/apinaja'
+yattaUrl = 'http://192.168.1.35:3000/apinaja'
 stay = 0x01
 interval = 0x00
 repeat = 0x15
@@ -182,11 +182,10 @@ fastSwitchCmd = makeCmd([0x8A, 0x00, stay, 0x03, stay,
 resetCmd = makeCmd([0x70])
 getPowerCmd = makeCmd([0x77])
 resetCmd = makeCmd([0x70])
-powerCmd = makeCmd([0x76, 0x1E])
+powerCmd = makeCmd([0x76, 0x21, 0x20, 0x19, 0x18])
 getFreqCmd = makeCmd([0x79])
 freqLowCmd = makeCmd([0x78, 0x01, 0x07, 0x11])
 freqHighCmd = makeCmd([0x78, 0x01, 0x2B, 0x35])
-freqFCCCmd = makeCmd([0x78, 0x01, 0x07, 0x3B])  # Full FCC 902-928MHz
 
 db = sqlite3.connect(connectionString)
 conn = db.cursor()

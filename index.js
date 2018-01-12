@@ -6,7 +6,7 @@ const express = require('express');
 const app = express();
 var history = require('connect-history-api-fallback');
 const server = require('http').Server(app);
-const io = require('socket.io')(server);
+//const io = require('socket.io')(server);
 const redis = require("redis");
 console.log('REDISCLOUD_URL', process.env.REDISCLOUD_URL);
 redisClient = redis.createClient(process.env.REDISCLOUD_URL, {
@@ -17,7 +17,7 @@ var root = __dirname + '/public';
 app.use(express.static('public'));
 app.use(history({
   disableDotRule: true,
-  verbose: true
+  verbose: false
 }));
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({
@@ -34,6 +34,7 @@ app.use(function (req, res, next) {
 });
 app.post('/apinaja/addTags', function (req, res) {
   var tags = req.body.tags;
+  var matName = req.body.matName;
   var stat = req.body.stat;
   if (!Array.isArray(tags)) tags = JSON.parse(tags);
   console.log('addingTags ' + tags.length);
@@ -62,14 +63,21 @@ app.post('/apinaja/addTags', function (req, res) {
           });
           runner.updatedAt = updatedAt;
           related.forEach((u, idx) => {
+            var matLog = new matLogModel({
+              'matName': matName,
+              'matId': u[0],
+              'tagId': runner.tagId,
+              'updatedAt': updatedAt
+            });
+            matLog.save((err, result) => {});
             if (u[0] == 1 && runner.chk1 == 0) {
               runner.chk1 = (u[2] < gunTime) ? gunTime : u[2];
             }
             if (u[0] == 2 && runner.chk2 == 0) {
               runner.chk2 = u[2];
-              if (runner.chk2 == 0) {
+              if (runner.chk1 == 0) {
                 runner.isFakeStart = true;
-                runner.chk1 = gunTime;
+                runner.chk1 = gunTime + Math.floor(Math.random() * 20) * 1000;
               }
             }
           });
@@ -117,19 +125,6 @@ app.post('/apinaja/startRace', function (req, res) {
         chk1: gunTime
       }
     });
-  });
-});
-app.post('/apinaja/runnersCountByRaceCat', function (req, res) {
-  runnerModel.aggregate({
-    $group: {
-      _id: '$raceCat',
-      count: {
-        $sum: 1
-      }
-    }
-  }).exec(function (err, result) {
-    console.log(result);
-    res.send(result);
   });
 });
 
@@ -228,64 +223,21 @@ app.post('/apinaja/raceResult', async function (req, res) {
     });
   });
 });
-app.post('/apinaja/runnersCountByGender', function (req, res) {
-  runnerModel.aggregate([{
-    $match: {
-      'race': 'mini'
-    }
-  }, {
-    $group: {
-      _id: '$gender',
-      count: {
-        $sum: 1
-      }
-    }
-  }]).exec(function (err, result) {
-    console.log(result);
-    res.send(result);
-  });
-});
-app.post('/apinaja/getWinner_bak', function (req, res) {
-  var mongo = require('mongodb');
-  var MongoClient = mongo.MongoClient;
-  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
-    if (err) {
-      res.send('error');
+app.post('/apinaja/warp/:bibNo/:m/:s', function (req, res) {
+  redisClient.get('gunTime', function (err, t) {
+    if (err || typeof t == 'undefined' || !t) {
+      res.send('0');
       return false;
     }
-    db.collection('runners').aggregate([{
-      '$match': {
-        '$and': [{
-          'chk2': {
-            '$nin': [0, null]
-          }
-        }, {
-          'raceCat': {
-            '$nin': ['xx', null]
-          }
-        }]
-      }
-    }, {
-      '$sort': {
-        'raceCat': 1,
-        'chk2': 1
-      }
-    }, {
-      '$group': {
-        '_id': '$raceCat',
-        'docs': {
-          '$push': '$$ROOT'
-        }
-      }
-    }, {
-      '$project': {
-        'runners': {
-          '$slice': ['$docs', 10]
-        }
-      }
-    }]).toArray(function (err, item) {
-      console.log(item);
-      res.send(item);
+    runnerModel.find({
+      bib_number: req.params.bibNo*1
+    }, function (err, result) {
+      var chk2=t*1+(req.params.m*60 +req.params.s*1)*1000;
+      var updatedAt = new Date().getTime();
+      result[0].chk2=chk2;
+      result[0].updatedAt=updatedAt;
+      result[0].save((err, result) => {});
+      res.send(result[0]);
     });
   });
 });
@@ -308,28 +260,16 @@ app.post('/apinaja/resetRace', function (req, res) {
       return false;
     }
     res.send('db ok');
+    db.collection('matlogs').remove({});
     db.collection('runners').updateMany({}, {
       $set: {
         updatedAt: new Date().getTime(),
         chk1: 0,
-        chk2: tmp + Math.floor(Math.random() * 1000000),
+        //chk2: tmp + Math.floor(Math.random()*3600) * 1000,
+        chk2: 0,
         isFakeStart: false
       }
     });
-  });
-});
-app.post('/apinaja/foo', function (req, res) {
-  runnerModel.find({
-    raceCat: '20f'
-  }).select({
-    raceCat:1,race:1,bib_number:1
-  }).exec(function (err, result) {
-    console.log(result);
-    result.map(runner => {
-      runner.raceCat='00f';
-      runner.save((err, result) => {});
-    });
-    res.send(result)
   });
 });
 app.post('/apinaja/runners/:updatedAt', function (req, res) {
@@ -348,6 +288,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
     name_on_bib: 1,
     first_name: 1,
     last_name: 1,
+    gender: 1,
     raceCat: 1,
     chk1: 1,
     chk2: 1,
@@ -362,6 +303,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
         bibNo: result[i].bib_number * 1,
         bibName: result[i].name_on_bib,
         name: result[i].first_name + ' ' + result[i].last_name,
+        gender: result[i].gender,
         raceCat: result[i].raceCat,
         chk1: result[i].chk1,
         chk2: result[i].chk2,
@@ -372,79 +314,35 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
     res.send(ret);
   });
 });
-app.post('/apinaja/runnersWithData/:updatedAt', function (req, res) {
-  //console.log('here');
-  var ret = [];
-  runnerModel.find({
-    $and: [{
-      $or: [{
-        chk1: {
-          $gt: 0
-        }
-      }, {
-        chk2: {
-          $gt: 0
-        }
-      }]
-    }, {
-      updatedAt: {
-        $gte: req.params.updatedAt
-      }
-    }]
-  }).select({
-    tagId: 1,
-    bib_number: 1,
-    name_on_bib: 1,
-    first_name: 1,
-    last_name: 1,
-    raceCat: 1,
-    chk1: 1,
-    chk2: 1,
-    isFakeStart: 1,
-    updatedAt: 1
-  }).sort({
-    updatedAt: -1
-  }).exec(function (err, result) {
-    for (var i in result) {
-      ret.push({
-        tagId: result[i].tagId * 1,
-        bibNo: result[i].bib_number * 1,
-        bibName: result[i].name_on_bib,
-        name: result[i].first_name + ' ' + result[i].last_name,
-        raceCat: result[i].raceCat,
-        chk1: result[i].chk1,
-        chk2: result[i].chk2,
-        isFakeStart: result[i].isFakeStart,
-        updatedAt: result[i].updatedAt
-      })
-    }
-    res.send(ret);
-  });
-});
-//socket io
-io.on('connection', function (client) {
-  console.log('\n---io.on connection\n\n');
-  client.on('joinRace', function (raceName) {
-    console.log('raceName from io: x' + raceName + 'x');
-    console.log(client.id);
-    client.join(raceName);
-    // MatLog.find({
-    //   raceName: raceName
-    // }).exec(function (err, data) {
-    //   var ret = [];
-    //   for (var i in data) {
-    //     ret.push([data[i].matId, data[i].tagId, data[i].tStamp])
-    //   }
-    //   io.to(raceName).emit('currtags', ret);
-    // });
-  });
-});
+// //socket io
+// io.on('connection', function (client) {
+//   console.log('\n---io.on connection\n\n');
+//   client.on('joinRace', function (raceName) {
+//     console.log('raceName from io: x' + raceName + 'x');
+//     console.log(client.id);
+//     client.join(raceName);
+//   });
+// });
 //mongo
 var mongoose = require('mongoose');
 mongoose.connect(process.env.ONG_MONGODB_URI, {
   useMongoClient: true
 });
 mongoose.Promise = global.Promise;
+var matLogSchema = new mongoose.Schema({
+  matName: {
+    type: String
+  },
+  matId: {
+    type: Number
+  },
+  tagId: {
+    type: Number
+  },
+  updatedAt: {
+    type: Number
+  }
+});
 var runnersSchema = new mongoose.Schema({
   _id: {
     type: String
@@ -520,4 +418,34 @@ runnersSchema.statics.findByTags = function (tags, cb) {
     }
   }, 'tagId chk1 chk2 updatedAt', cb);
 };
+var matLogModel = mongoose.model('matLog', matLogSchema);
 var runnerModel = mongoose.model('runner', runnersSchema);
+/*
+const escpos = require('escpos');
+const device = new escpos.USB();
+// const device  = new escpos.Network('localhost');
+// const device  = new escpos.Serial('/dev/usb/lp0');
+const printer = new escpos.Printer(device);
+//zadig-2.3.exe เลือก libusb-win32 ให้ USB Printing Support
+escpos.Image.load(__dirname + '/a.png', function (image) {
+  device.open(function () {
+    printer
+      // .font('a')
+      .align('ct')
+      // .style('bu')
+      //.encode('utf-8')
+      //.size(1, 1)
+      .image(image, 'd24')
+      // .text('The quick ')
+      // .text('สวัสดี')
+      // .text('The quick brown fox jumps over the lazy dog')
+      // .text('. ')
+      // .text('. ')
+      .cut().close();
+    // .qrimage('https://github.com/song940/node-escpos', function(err){
+    //   this.cut();
+    //   this.close();
+    // });
+  });
+});
+*/
