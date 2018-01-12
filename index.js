@@ -284,6 +284,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
     }
   }).select({
     tagId: 1,
+    is_alumni:1,
     bib_number: 1,
     name_on_bib: 1,
     first_name: 1,
@@ -300,6 +301,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
     for (var i in result) {
       ret.push({
         tagId: result[i].tagId * 1,
+        e: result[i].(is_alumni=='yes')?'E':' ',
         bibNo: result[i].bib_number * 1,
         bibName: result[i].name_on_bib,
         name: result[i].first_name + ' ' + result[i].last_name,
