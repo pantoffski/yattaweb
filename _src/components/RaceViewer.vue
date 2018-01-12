@@ -7,10 +7,10 @@
   <button @click='startRace'>startRace</button>
   <br/><br/>
   <button @click='resetData'>resetData</button>
-  <br/><br/>
-  bib<input type='text' v-model='bib'/>
-  min<input type='text' v-model='min'/>
-  sec<input type='text' v-model='sec'/>
+  <br/><br/> bib
+  <input type='text' v-model='bib' /> min
+  <input type='text' v-model='min' /> sec
+  <input type='text' v-model='sec' />
   <button @click='warp'>แก้เวลา</button>
   <br/><br/>
   <br/>
@@ -21,15 +21,19 @@
 export default {
   name: 'raceViewer',
   data() {
-    return {bib:'',min:'',sec:''}
+    return {
+      bib: '',
+      min: '',
+      sec: ''
+    }
   },
   methods: {
     warp() {
       if (confirm('แก้เวลา ?')) {
-      this.$http.post('/warp/'+this.bib+'/'+this.min+'/'+this.sec).then(resp => {
-        console.log(resp.data);
-      });
-    }
+        this.$http.post('/warp/' + this.bib + '/' + this.min + '/' + this.sec).then(resp => {
+          console.log(resp.data);
+        });
+      }
     },
     resetData() {
       var p = prompt('reset');
@@ -56,6 +60,7 @@ export default {
 
 <style lang='less' >
 #raceViewer {
+    color: white;
     .logContainer {
         border: 1px solid black;
         height: 100px;
