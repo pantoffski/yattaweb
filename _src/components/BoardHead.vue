@@ -10,8 +10,7 @@ export default {
   name: 'boardHead',
   props: ['raceCat', 'isClear'],
   data() {
-    return {
-    }
+    return {}
   },
   computed: {
     mainCat() {
@@ -46,14 +45,14 @@ export default {
         height: 145px;
         transition-duration: 0.5s;
         transition-delay: 0.0s;
-        &:after{
-          content:'';
-          position: absolute;
-          display: block;
-          top:0px;
-          left:0px;
-          width: 145px;
-          height: 145px;
+        &:after {
+            content: '';
+            position: absolute;
+            display: block;
+            top: 0;
+            left: 0;
+            width: 145px;
+            height: 145px;
         }
         &.male:after {
             background: url("../img/m.png");
@@ -91,6 +90,7 @@ export default {
         transition-duration: 0.5s;
         transition-delay: 0.0s;
         &.hide {
+            transition-duration: 0.5s;
             transition-delay: 0.5s;
             transform: rotateX(90deg);
         }
