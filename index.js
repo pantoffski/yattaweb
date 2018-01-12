@@ -277,9 +277,9 @@ app.post('/apinaja/resetRace', function (req, res) {
     db.collection('runners').updateOne({
       bib_number: 1
     }, {
-      $set: {
-        //updatedAt: updatedAt + 1,
-      }
+      // $set: {
+      //   updatedAt: updatedAt + 1,
+      // }
     });
   });
 });
