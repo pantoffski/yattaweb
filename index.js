@@ -38,7 +38,7 @@ app.post('/apinaja/addTags', function (req, res) {
   var stat = req.body.stat;
   if (!Array.isArray(tags)) tags = JSON.parse(tags);
   console.log('addingTags ' + tags.length);
-  console.log(tags);
+  //console.log(tags);
   var hash = md5(JSON.stringify(tags));
   var tag2find = [...new Set(tags.map(t => t[1]))];
   var updatedAt = new Date().getTime();
@@ -268,7 +268,7 @@ app.post('/apinaja/resetRace', function (req, res) {
       }
     }, {
       $set: {
-        //updatedAt: updatedAt,
+        updatedAt: updatedAt,
         chk1: 0,
         chk2: 0,
         isFakeStart: false
@@ -287,9 +287,14 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
   //console.log('here');
   var ret = [];
   runnerModel.find({
-    tagId: {
-      $nin: ['', null]
-    },
+        '$and': [{
+          'tagId': {
+            '$nin': ['', null]
+          }
+        }, {
+          'race': 'mini'
+        }]
+      },
     updatedAt: {
       $gte: req.params.updatedAt
     }
