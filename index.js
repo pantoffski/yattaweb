@@ -279,6 +279,9 @@ app.post('/apinaja/resetRace', function (req, res) {
     }, {
        $set: {
          updatedAt: updatedAt + 1,
+        chk1: 0,
+        chk2: 0,
+        isFakeStart: false
        }
     });
   });
