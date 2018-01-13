@@ -88,7 +88,7 @@ app.post('/apinaja/addTags', function (req, res) {
         });
       });
       Promise.all(addingTags).then((resolve) => {
-        io.emit('tagStat', tags.length + ' tags added. ' + stat);
+        //io.emit('tagStat', tags.length + ' tags added. ' + stat);
         res.send(hash + '');
       });
     });
