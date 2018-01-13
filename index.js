@@ -38,7 +38,7 @@ app.post('/apinaja/addTags', function (req, res) {
   var stat = req.body.stat;
   if (!Array.isArray(tags)) tags = JSON.parse(tags);
   console.log('addingTags ' + tags.length);
-  //console.log(tags);
+  console.log(tags);
   var hash = md5(JSON.stringify(tags));
   var tag2find = [...new Set(tags.map(t => t[1]))];
   var updatedAt = new Date().getTime();
