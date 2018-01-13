@@ -296,7 +296,7 @@ app.post('/apinaja/runners/:updatedAt', function (req, res) {
         },{
     updatedAt: {
       $gte: req.params.updatedAt
-    }]
+    }}]
   }).select({
     tagId: 1,
     is_alumni: 1,
