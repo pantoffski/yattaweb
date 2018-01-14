@@ -93,40 +93,40 @@ app.post('/apinaja/addTags', function (req, res) {
       });
     });
   });
-});
-app.post('/apinaja/startRace', function (req, res) {
-  redisClient.set('gunTime', req.body.gunTime);
-  var mongo = require('mongodb');
-  var MongoClient = mongo.MongoClient;
-  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
-    if (err) {
-      res.send('error');
-      return false;
-    }
-    res.send('ok ' + req.body.gunTime);
-    var gunTime = req.body.gunTime * 1;
-    db.collection('runners').updateMany({
-      $and: [{
-        tagId: {
-          $nin: ['', null]
-        }
-      }, {
-        chk1: {
-          $gt: 0
-        }
-      }, {
-        chk1: {
-          $lt: gunTime
-        }
-      }]
-    }, {
-      $set: {
-        updatedAt: new Date().getTime(),
-        chk1: gunTime
-      }
-    });
-  });
-});
+// });
+// app.post('/apinaja/startRace', function (req, res) {
+//   redisClient.set('gunTime', req.body.gunTime);
+//   var mongo = require('mongodb');
+//   var MongoClient = mongo.MongoClient;
+//   MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
+//     if (err) {
+//       res.send('error');
+//       return false;
+//     }
+//     res.send('ok ' + req.body.gunTime);
+//     var gunTime = req.body.gunTime * 1;
+//     db.collection('runners').updateMany({
+//       $and: [{
+//         tagId: {
+//           $nin: ['', null]
+//         }
+//       }, {
+//         chk1: {
+//           $gt: 0
+//         }
+//       }, {
+//         chk1: {
+//           $lt: gunTime
+//         }
+//       }]
+//     }, {
+//       $set: {
+//         updatedAt: new Date().getTime(),
+//         chk1: gunTime
+//       }
+//     });
+//   });
+// });
 
 function findOverall(is_alumni, gender) {
   return new Promise((resolve, reject) => {
@@ -249,43 +249,43 @@ app.post('/apinaja/getGunTime', function (req, res) {
     }
     res.send(t);
   });
-});
-app.post('/apinaja/resetRace', function (req, res) {
-  var mongo = require('mongodb');
-  var MongoClient = mongo.MongoClient;
-  var tmp = new Date().getTime();
-  MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
-    if (err) {
-      res.send('db error');
-      return false;
-    }
-    res.send('db ok');
-    var updatedAt = new Date().getTime()
-    db.collection('matlogs').remove({});
-    db.collection('runners').updateMany({
-      bib_number: {
-        $ne: 1
-      }
-    }, {
-      $set: {
-        updatedAt: updatedAt,
-        chk1: 0,
-        chk2: 0,
-        isFakeStart: false
-      }
-    });
-    db.collection('runners').updateOne({
-      bib_number: 1
-    }, {
-       $set: {
-         updatedAt: updatedAt + 1,
-        chk1: 0,
-        chk2: 0,
-        isFakeStart: false
-       }
-    });
-  });
-});
+// });
+// app.post('/apinaja/resetRace', function (req, res) {
+//   var mongo = require('mongodb');
+//   var MongoClient = mongo.MongoClient;
+//   var tmp = new Date().getTime();
+//   MongoClient.connect(process.env.ONG_MONGODB_URI, (err, db) => {
+//     if (err) {
+//       res.send('db error');
+//       return false;
+//     }
+//     res.send('db ok');
+//     var updatedAt = new Date().getTime()
+//     db.collection('matlogs').remove({});
+//     db.collection('runners').updateMany({
+//       bib_number: {
+//         $ne: 1
+//       }
+//     }, {
+//       $set: {
+//         updatedAt: updatedAt,
+//         chk1: 0,
+//         chk2: 0,
+//         isFakeStart: false
+//       }
+//     });
+//     db.collection('runners').updateOne({
+//       bib_number: 1
+//     }, {
+//        $set: {
+//          updatedAt: updatedAt + 1,
+//         chk1: 0,
+//         chk2: 0,
+//         isFakeStart: false
+//        }
+//     });
+//   });
+// });
 app.post('/apinaja/runners/:updatedAt', function (req, res) {
   //console.log('here');
   var ret = [];
