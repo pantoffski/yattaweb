@@ -93,7 +93,7 @@ app.post('/apinaja/addTags', function (req, res) {
       });
     });
   });
-// });
+});
 // app.post('/apinaja/startRace', function (req, res) {
 //   redisClient.set('gunTime', req.body.gunTime);
 //   var mongo = require('mongodb');
