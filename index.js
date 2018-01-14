@@ -249,7 +249,7 @@ app.post('/apinaja/getGunTime', function (req, res) {
     }
     res.send(t);
   });
-// });
+});
 // app.post('/apinaja/resetRace', function (req, res) {
 //   var mongo = require('mongodb');
 //   var MongoClient = mongo.MongoClient;
