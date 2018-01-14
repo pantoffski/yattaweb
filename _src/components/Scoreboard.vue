@@ -23,7 +23,7 @@ export default {
   name: 'scoreBoard',
   data() {
     return {
-      dispTime: 20,
+      dispTime: 10,
       blubs: this.genBlubs(),
       blubTimer: null,
       isClear: true,
