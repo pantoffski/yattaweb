@@ -172,7 +172,7 @@ matAddr = 0x01
 matName = 'left'
 matId = 1
 connectionString = "file:tagDb?mode=memory&cache=shared"
-#yattaUrl = 'https://babysharkicmm2018.herokuapp.com/apinaja'
+#yattaUrl = 'https://yattaweb.herokuapp.com/apinaja'
 yattaUrl = 'http://192.168.1.35:3000/apinaja'
 stay = 0x01
 interval = 0x00
